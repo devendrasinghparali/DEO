@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>स्कूल डेटा प्रविष्टि - मंदसौर नशा मुक्ति पोर्टल</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { background: #28a745; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #218838; }
+        .school-lock-box { background: #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        .back-link { display: block; text-align: center; margin-top: 15px; text-decoration: none; color: #007bff; }
+        .success-msg { color: green; font-weight: bold; text-align: center; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🏫 छात्र प्रविष्टि फॉर्म (स्कूल लॉक सिस्टम)</h2>
+    <div id="successMessage" class="success-msg"></div>
+    
+    <!-- स्टेप 1: स्कूल की जानकारी (जो एक बार भरी जाएगी) -->
+    <div id="schoolSection" class="school-lock-box">
+        <h3>1. अपने स्कूल का विवरण दर्ज करें</h3>
+        <div class="form-group">
+            <label for="blockName">ब्लॉक का नाम:</label>
+            <input type="text" id="blockName" placeholder="जैसे: मल्हारगढ़ / गरोठ" required>
+        </div>
+        <div class="form-group">
+            <label for="aeoCluster">AEO केंद्र / संकुल:</label>
+            <input type="text" id="aeoCluster" placeholder="संकुल का नाम" required>
+        </div>
+        <div class="form-group">
+            <label for="schoolName">स्कूल का नाम:</label>
+            <input type="text" id="schoolName" placeholder="शासकीय विद्यालय..." required>
+        </div>
+        <div class="form-group">
+            <label for="diseCode">डाइज कोड (DISE Code):</label>
+            <input type="text" id="diseCode" placeholder="11 अंकों का डाइज कोड" required>
+        </div>
+        <button type="button" id="lockSchoolBtn" style="background: #007bff;" onclick="lockSchoolDetails()">स्कूल लॉक करें & आगे बढ़ें</button>
+    </div>
+
+    <!-- स्टेप 2: बच्चों की जानकारी (जो बार-बार खुलेगा) -->
+    <form id="studentEntryForm" style="display: none;">
+        <div style="background: #d4edda; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 14px;">
+            🔒 <b>चयनित स्कूल:</b> <span id="displaySchoolInfo"></span> 
+            <button type="button" onclick="unlockSchool()" style="background: #dc3545; padding: 4px 8px; font-size: 12px; width: auto; float: right;">स्कूल बदलें</button>
+        </div>
+
+        <h3 style="color: #28a745; margin-top: 0;">2. छात्र की जानकारी दर्ज करें</h3>
+        
+        <div class="form-group">
+            <label for="studentName">छात्र/छात्रा का नाम:</label>
+            <input type="text" id="studentName" placeholder="पूरा नाम दर्ज करें" required>
+        </div>
+
+        <div class="form-group">
+            <label for="fatherName">पिता का नाम:</label>
+            <input type="text" id="fatherName" placeholder="पिता का नाम दर्ज करें" required>
+        </div>
+
+        <div class="form-group">
+            <label for="motherName">माता का नाम:</label>
+            <input type="text" id="motherName" placeholder="माता का नाम दर्ज करें" required>
+        </div>
+
+        <div class="form-group">
+            <label for="studentClass">कक्षा:</label>
+            <select id="studentClass" required>
+                <option value="">कक्षा चुनें</option>
+                <option value="6वीं">6वीं</option>
+                <option value="7वीं">7वीं</option>
+                <option value="8वीं">8वीं</option>
+                <option value="9वीं">9वीं</option>
+                <option value="10वीं">10वीं</option>
+                <option value="11वीं">11वीं</option>
+                <option value="12वीं">12वीं</option>
+            </select>
+        </div>
+
+        <button type="submit" id="submitBtn">अगला छात्र जोड़ें (Save & Add Next)</button>
+    </form>
+
+    <a href="index.html" class="back-link">← होमपेज पर वापस जाएं</a>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFgxs1IxALTNoZXgxEW6MKSrq-Q7dguhw",
+    authDomain: "mandsaur-nashamukt.firebaseapp.com",
+    projectId: "mandsaur-nashamukt",
+    storageBucket: "mandsaur-nashamukt.appspot.com",
+    messagingSenderId: "786976421007",
+    appId: "1:786976421007:web:867af9a4f5c72d2a772cfa"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  let lockedSchool = {};
+
+  function lockSchoolDetails() {
+      const block = document.getElementById('blockName').value.trim();
+      const aeo = document.getElementById('aeoCluster').value.trim();
+      const school = document.getElementById('schoolName').value.trim();
+      const dise = document.getElementById('diseCode').value.trim();
+
+      if(!block || !aeo || !school || !dise) {
+          alert("कृपया पहले सभी स्कूल विवरण भरें!");
+          return;
+      }
+
+      lockedSchool = { blockName: block, aeoCluster: aeo, schoolName: school, diseCode: dise };
+      
+      document.getElementById('displaySchoolInfo3').innerText = `${school} (DISE: ${dise})`; // Fix syntax or keep clean innerHTML
+      document.getElementById('displaySchoolInfo').innerText = `${school} [डाइज: ${dise}]`;
+      
+      document.getElementById('schoolSection').style.display = 'none';
+      document.getElementById('studentEntryForm').style.display = 'block';
+  }
+
+  function unlockSchool() {
+      document.getElementById('schoolSection').style.display = 'block';
+      document.getElementById('studentEntryForm').style.display = 'none';
+      document.getElementById('successMessage').innerText = "";
+  }
+
+  const form = document.getElementById('studentEntryForm');
+  form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "सेव हो रहा है...";
+
+      const studentName = document.getElementById('studentName').value.trim();
+      const fatherName = document.getElementById('fatherName').value.trim();
+      const motherName = document.getElementById('motherName').value.trim();
+      const studentClass = document.getElementById('studentClass').value;
+
+      db.collection("students").add({
+          blockName: lockedSchool.blockName,
+          aeoCluster: lockedSchool.aeoCluster,
+          schoolName: lockedSchool.schoolName,
+          diseCode: lockedSchool.diseCode,
+          studentName: studentName,
+          fatherName: fatherName,
+          motherName: motherName,
+          studentClass: studentClass,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+          document.getElementById('successMessage').innerText = `✅ "${studentName}" की जानकारी सफलतापूर्वक जुड़ गई! अगला छात्र जोड़ें।`;
+          
+          // केवल बच्चों के फॉर्म रीसेट होंगे, स्कूल का डेटा लॉक ही रहेगा
+          document.getElementById('studentName').value = '';
+          document.getElementById('fatherName').value = '';
+          document.getElementById('motherName').value = '';
+          document.getElementById('studentClass').value = '';
+          
+          submitBtn.disabled = false;
+          submitBtn.innerText = "अगला छात्र जोड़ें (Save & Add Next)";
+      })
+      .catch((error) => {
+          alert("त्रुटि: " + error.message);
+          submitBtn.disabled = false;
+          submitBtn.innerText = "अगला छात्र जोड़ें (Save & Add Next)";
+      });
+  });
+</script>
+
+</body>
+</html>
