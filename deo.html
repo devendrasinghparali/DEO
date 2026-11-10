@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEO मॉनिटरिंग डैशबोर्ड - मंदसौर नशा मुक्ति पोर्टल</title>
+    <!-- Chart.js CDN ग्राफिकल डिस्प्ले के लिए -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { background: #dc3545; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #c82333; }
+        
+        #dashboardContent { display: none; }
+        .stats-box { display: flex; gap: 15px; margin-bottom: 20px; }
+        .stat-card { flex: 1; background: #e9ecef; padding: 15px; border-radius: 6px; text-align: center; }
+        .stat-card h3 { margin: 0 0 10px 0; color: #007bff; font-size: 22px; }
+        
+        /* ग्राफ के लिए लेआउट */
+        .chart-container { width: 300px; height: 300px; margin: 0 auto 25px auto; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        
+        .back-link { display: block; text-align: center; margin-top: 20px; text-decoration: none; color: #007bff; }
+        #loginError { color: red; text-align: center; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📊 DEO / जिला मॉनिटरिंग डैशबोर्ड</h2>
+
+    <!-- लॉगिन सेक्शन -->
+    <div id="loginSection">
+        <div class="form-group">
+            <label for="deoPassword">डैशबोर्ड पासवर्ड दर्ज करें:</label>
+            <input type="password" id="deoPassword" placeholder="पासवर्ड दर्ज करें">
+        </div>
+        <button type="button" onclick="checkLogin()">लॉगिन करें (Login)</button>
+        <div id="loginError"></div>
+    </div>
+
+    <!-- डैशबोर्ड मुख्य सामग्री -->
+    <div id="dashboardContent">
+        <div class="stats-box">
+            <div class="stat-card">
+                <h3 id="totalStudentsCount">0</h3>
+                <p>कुल पंजीकृत छात्र</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalAssessmentsCount">0</h3>
+                <p>संपन्न टेस्ट</p>
+            </div>
+        </div>
+
+        <!-- ग्राफिकल चार्ट सेक्शन -->
+        <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+        </div>
+
+        <h3 style="color: #333; border-bottom: 2px solid #ddd; padding-bottom: 5px;">छात्र मूल्यांकन रिपोर्ट</h3>
+        
+        <div style="overflow-x: auto;">
+            <table id="reportTable">
+                <thead>
+                    <tr>
+                        <th>ब्लॉक</th>
+                        <th>संकुल (AEO)</th>
+                        <th>स्कूल नाम</th>
+                        <th>छात्र का नाम</th>
+                        <th>कक्षा</th>
+                        <th>प्राप्तांक</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- डेटा यहाँ जावास्क्रिप्ट से जुड़ेगा -->
+                </tbody>
+            </table>
+        </div>
+
+        <button onclick="location.reload()" style="background: #6c757d; margin-top: 20px;">लॉग आउट करें</button>
+    </div>
+
+    <a href="index.html" class="back-link">← होमपेज पर वापस जाएं</a>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFgxs1IxALTNoZXgxEW6MKSrq-Q7dguhw",
+    authDomain: "mandsaur-nashamukt.firebaseapp.com",
+    projectId: "mandsaur-nashamukt",
+    storageBucket: "mandsaur-nashamukt.appspot.com",
+    messagingSenderId: "786976421007",
+    appId: "1:786976421007:web:867af9a4f5c72d2a772cfa"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const correctPassword = "deo123";
+  let myChart = null;
+
+  function checkLogin() {
+      const pass = document.getElementById('deoPassword').value.trim();
+      if(pass === correctPassword) {
+          document.getElementById('loginSection').style.display = 'none';
+          document.getElementById('dashboardContent').style.display = 'block';
+          loadDashboardData();
+      } else {
+          document.getElementById('loginError').innerText = "गलत पासवर्ड! कृपया पुनः प्रयास करें।";
+      }
+  }
+
+  async function loadDashboardData() {
+      try {
+          // 1. कुल रजिस्टर्ड छात्र लाएं
+          const studentsSnap = await db.collection("students").get();
+          const totalStudents = studentsSnap.size;
+          document.getElementById('totalStudentsCount').innerText = totalStudents;
+
+          // 2. संपन्न टेस्ट लाएं
+          const assessmentsSnap = await db.collection("assessments").orderBy("submittedAt", "desc").get();
+          const totalAssessments = assessmentsSnap.size;
+          document.getElementById('totalAssessmentsCount').innerText = totalAssessments;
+
+          // ग्राफ अपडेट करें (पंजीकृत vs संपन्न टेस्ट)
+          updateChart(totalStudents, totalAssessments);
+
+          // टेबल डेटा भरें
+          const tbody = document.getElementById('tableBody');
+          tbody.innerHTML = '';
+
+          if(assessmentsSnap.empty) {
+              tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">अभी तक कोई टेस्ट डेटा उपलब्ध नहीं है।</td></tr>';
+              return;
+          }
+
+          assessmentsSnap.forEach((doc) => {
+              const data = doc.data();
+              const sDetails = data.studentDetails || {};
+              
+              let tr = document.createElement('tr');
+              tr.innerHTML = `
+                  <td>${sDetails.blockName || '-'}</td>
+                  <td>${sDetails.aeoCluster || '-'}</td>
+                  <td>${sDetails.schoolName || '-'} (डाइज: ${sDetails.diseCode || '-'})</td>
+                  <td>${sDetails.studentName || 'अज्ञात'}</td>
+                  <td>${sDetails.studentClass || '-'}</td>
+                  <td><b>${data.score} / ${data.totalQuestions}</b></td>
+              `;
+              tbody.appendChild(tr);
+          });
+
+      } catch (error) {
+          alert("डेटा लोड करने में त्रुटि: " + error.message);
+      }
+  }
+
+  // Chart.js से पाई चार्ट बनाने का फंक्शन
+  function updateChart(registered, completed) {
+      const ctx = document.getElementById('statusChart').getContext('2d');
+      
+      if (myChart) {
+          myChart.destroy(); // पुराना चार्ट साफ़ करें यदि दोबारा लोड हो
+      }
+
+      myChart = new Chart(ctx, {
+          type: 'doughnut', // गोलाकार खूबसूरत चार्ट
+          data: {
+              labels: ['कुल रजिस्टर्ड छात्र', 'संपन्न टेस्ट'],
+              datasets: [{
+                  data: [registered, completed],
+                  backgroundColor: ['#007bff', '#28a745'],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                  legend: {
+                      position: 'bottom'
+                  }
+              }
+          }
+      });
+  }
+</script>
+
+</body>
+</html>
