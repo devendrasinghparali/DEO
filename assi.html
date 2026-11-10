@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>छात्र स्व-मूल्यांकन टेस्ट - मंदसौर नशा मुक्ति पोर्टल</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        .question-box { background: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #007bff; }
+        .question-box p { font-weight: bold; margin-top: 0; color: #333; }
+        .options label { display: block; font-weight: normal; margin-bottom: 8px; cursor: pointer; }
+        .back-link { display: block; text-align: center; margin-top: 15px; text-decoration: none; color: #007bff; }
+        #testSection { display: none; }
+        #resultSection { display: none; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📝 छात्र नशा मुक्ति स्व-मूल्यांकन टेस्ट</h2>
+
+    <!-- स्टेप 1: छात्र पहचान (DISE Code और नाम का चयन) -->
+    <div id="loginSection">
+        <div class="form-group">
+            <label for="searchDise">अपने स्कूल का डाइज कोड (DISE Code) दर्ज करें:</label>
+            <input type="text" id="searchDise" placeholder="11 अंकों का डाइज कोड">
+        </div>
+        <button type="button" onclick="loadStudents()">छात्र सूची देखें</button>
+        
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="studentSelect">अपना नाम चुनें:</label>
+            <select id="studentSelect">
+                <option value="">-- पहले डाइज कोड दर्ज करें --</option>
+            </select>
+        </div>
+        <button type="button" id="startTestBtn" style="background: #28a745; margin-top: 10px; display:none;" onclick="startTest()">टेस्ट शुरू करें</button>
+    </div>
+
+    <!-- स्टेप 2: 10 प्रश्नों का असेसमेंट फॉर्म -->
+    <form id="testSection">
+        <div id="questionsContainer"></div>
+        <button type="submit" id="submitTestBtn" style="background: #28a745;">टेस्ट सबमिट करें (Submit Test)</button>
+    </form>
+
+    <!-- स्टेप 3: रिजल्ट स्क्रीन -->
+    <div id="resultSection">
+        <h3 style="color: #28a745;">🎉 धन्यवाद! आपका टेस्ट सफलतापूर्वक जमा हो गया है।</h3>
+        <p id="scoreDisplay" style="font-size: 18px; font-weight: bold;"></p>
+        <a href="index.html" class="back-link">होमपेज पर वापस जाएं</a>
+    </div>
+
+    <a href="index.html" class="back-link" style="margin-top: 20px;">← होमपेज पर वापस जाएं</a>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFgxs1IxALTNoZXgxEW6MKSrq-Q7dguhw",
+    authDomain: "mandsaur-nashamukt.firebaseapp.com",
+    projectId: "mandsaur-nashamukt",
+    storageBucket: "mandsaur-nashamukt.appspot.com",
+    messagingSenderId: "786976421007",
+    appId: "1:786976421007:web:867af9a4f5c72d2a772cfa"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  let selectedStudentId = null;
+  let studentDataCache = {};
+
+  // 10 प्रश्नों और उनके सही उत्तरों का डेटा
+  const questionsList = [
+    { id: 1, q: "प्रश्न 1. नशा किसे कहते हैं?", options: ["नियमित व्यायाम करना", "तंबाकू, शराब एवं अन्य नशीले पदार्थों का सेवन करना", "पौष्टिक भोजन करना", "समय पर सोना"], correct: 1 },
+    { id: 2, q: "प्रश्न 2. तंबाकू का सेवन करने से कौन-सी गंभीर बीमारी हो सकती है?", options: ["कैंसर", "सर्दी-जुकाम", "सामान्य बुखार", "इनमें से कोई नहीं"], correct: 0 },
+    { id: 3, q: "प्रश्न 3. शराब का सेवन शरीर के किस अंग को सबसे अधिक नुकसान पहुँचाता है?", options: ["बाल", "नाखून", "यकृत (लीवर)", "त्वचा"], correct: 2 },
+    { id: 4, q: "प्रश्न 4. क्या नशे की लत व्यक्ति के परिवार और सामाजिक जीवन को प्रभावित करती है?", options: ["हाँ", "नहीं", "कभी नहीं", "केवल बच्चों को"], correct: 0 },
+    { id: 5, q: "प्रश्न 5. यदि आपका कोई मित्र नशा करने के लिए प्रेरित करता है, तो आप क्या करेंगे?", options: ["उसकी बात मान लेंगे", "एक बार सेवन करेंगे", "स्पष्ट रूप से मना करेंगे", "दूसरों को भी प्रेरित करेंगे"], correct: 2 },
+    { id: 6, q: "प्रश्न 6. नशे की लत से छुटकारा पाने के लिए सबसे अच्छा उपाय क्या है?", options: ["नशे का सेवन कम करने का प्रयास करके अकेले रहना", "डॉक्टर एवं विशेषज्ञ की सहायता लेना", "नशे को सामान्य समझना", "समस्या को छिपाना"], correct: 1 },
+    { id: 7, q: "प्रश्न 7. बच्चों एवं युवाओं को नशे से दूर रखने में किसकी भूमिका महत्वपूर्ण है?", options: ["केवल सरकार की", "केवल शिक्षकों की", "केवल माता-पिता की", "परिवार, विद्यालय एवं समाज सभी की"], correct: 3 },
+    { id: 8, q: "प्रश्न 8. ई-सिगरेट और वेपिंग क्या पूरी तरह सुरक्षित हैं?", options: ["हाँ", "नहीं", "केवल युवाओं के लिए सुरक्षित हैं", "केवल कभी-कभी उपयोग करने पर सुरक्षित हैं"], correct: 1 },
+    { id: 9, q: "प्रश्न 9. नशा मुक्ति अभियान में आप किस प्रकार योगदान दे सकते हैं?", options: ["लोगों को नशे के दुष्परिणाम बताकर", "नशामुक्ति का संदेश फैलाकर", "नशे से दूर रहने की शपथ लेकर", "उपरोक्त सभी"], correct: 3 },
+    { id: 10, q: "प्रश्न 10. क्या आप स्वयं नशामुक्त रहने तथा दूसरों को भी नशे से दूर रहने के लिए प्रेरित करने का संकल्प लेते हैं?", options: ["हाँ, पूर्ण रूप से", "प्रयास करूँगा/करूँगी", "अभी निश्चित नहीं हूँ", "नहीं"], correct: 0 }
+  ];
+
+  // स्कूल के डाइज कोड से छात्रों के नाम लोड करना
+  function loadStudents() {
+      const dise = document.getElementById('searchDise').value.trim();
+      const select = document.getElementById('studentSelect');
+      select.innerHTML = '<option value="">लोड हो रहा है...</option>';
+
+      if(!dise) {
+          alert("कृपया डाइज कोड दर्ज करें!");
+          select.innerHTML = '<option value="">-- पहले डाइज कोड दर्ज करें --</option>';
+          return;
+      }
+
+      db.collection("students").where("diseCode", "==", dise).get()
+      .then((querySnapshot) => {
+          select.innerHTML = '<option value="">-- अपना नाम चुनें --</option>';
+          if(querySnapshot.empty) {
+              alert("इस डाइज कोड पर कोई छात्र दर्ज नहीं मिला! पहले 'मास्टर एंट्री' से छात्र जोड़ें।");
+              return;
+          }
+          querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              studentDataCache[doc.id] = data;
+              let opt = document.createElement('option');
+              opt.value = doc.id;
+              opt.innerText = `${data.studentName} (पिता: ${data.fatherName} - कक्षा: ${data.studentClass})`;
+              select.appendChild(opt);
+          });
+          document.getElementById('startTestBtn').style.display = 'block';
+      })
+      .catch((error) => {
+          alert("त्रुटि: " + error.message);
+      });
+  }
+
+  // टेस्ट शुरू करना और प्रश्न रेंडर करना
+  function startTest() {
+      selectedStudentId = document.getElementById('studentSelect').value;
+      if(!selectedStudentId) {
+          alert("कृपया सूची में से अपना नाम चुनें!");
+          return;
+      }
+
+      document.getElementById('loginSection').style.display = 'none';
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+
+      questionsList.forEach((item, index) => {
+          let box = document.createElement('div');
+          box.className = 'question-box';
+          
+          let optionsHtml = '';
+          item.options.forEach((optText, optIndex) => {
+              optionsHtml += `<label><input type="radio" name="q${item.id}" value="${optIndex}" required> ${optText}</label>`;
+          });
+
+          box.innerHTML = `<p>${item.q}</p><div class="options">${optionsHtml}</div>`;
+          container.appendChild(box);
+      });
+
+      document.getElementById('testSection').style.display = 'block';
+  }
+
+  // टेस्ट सबमिट और स्कोर गणना
+  const testForm = document.getElementById('testSection');
+  testForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      let score = 0;
+      questionsList.forEach((item) => {
+          const selectedOption = document.querySelector(`input[name="q${item.id}"]:checked`);
+          if(selectedOption && parseInt(selectedOption.value) === item.correct) {
+              score += 1;
+          }
+      });
+
+      const submitBtn = document.getElementById('submitTestBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "सहेज रहे हैं...";
+
+      // डेटाबेस में असेसमेंट रिजल्ट सेव करना
+      db.collection("assessments").add({
+          studentId: selectedStudentId,
+          studentDetails: studentDataCache[selectedStudentId],
+          score: score,
+          totalQuestions: questionsList.length,
+          submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+          document.getElementById('testSection').style.display = 'none';
+          document.getElementById('resultSection').style.display = 'block';
+          document.getElementById('scoreDisplay').innerText = `आपके कुल अंक: ${score} / ${questionsList.length}`;
+      })
+      .catch((error) => {
+          alert("त्रुटि: " + error.message);
+          submitBtn.disabled = false;
+          submitBtn.innerText = "टेस्ट सबमिट करें (Submit Test)";
+      });
+  });
+</script>
+
+</body>
+</html>
