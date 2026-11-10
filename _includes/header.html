@@ -1,0 +1,150 @@
+
+<header class="main-header">
+  <div class="header-top">
+    <div class="header-emblem">🏛️</div>
+    <div class="header-info">
+      <h1>कार्यालय जिला शिक्षा अधिकारी, मंदसौर</h1>
+      <p>स्कूल शिक्षा विभाग | मध्यप्रदेश शासन</p>
+      <p>जिला मंदसौर, मध्यप्रदेश</p>
+    </div>
+  </div>
+</header>
+
+<nav class="main-nav">
+  <a href="/">होम</a>
+  <a href="/#about">हमारे बारे में</a>
+  <a href="/#notices">सूचनाएँ एवं आदेश</a>
+  <a href="/#services">महत्वपूर्ण लिंक</a>
+  <a href="/#gallery">गैलरी</a>
+  <a href="/#contact">संपर्क</a>
+</nav>
+
+<!-- नशामुक्ति अभियान लिंक -->
+<div class="nasha-bar">
+  <a href="javascript:void(0)"
+     onclick="openNashaPopup()"
+     class="nasha-link">
+
+    <span class="nasha-icon">🚭</span>
+
+    <span>
+      विशेष अभियान : नशामुक्त मध्यप्रदेश – नशामुक्त मंदसौर
+    </span>
+
+    <span class="nasha-dot">🔴</span>
+  </a>
+</div>
+
+<style>
+.main-header{
+  background:linear-gradient(120deg,#073b75,#087e9c);
+  color:white;
+  padding:22px 15px;
+}
+
+.header-top{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  text-align:center;
+}
+
+.header-emblem{
+  font-size:48px;
+}
+
+.header-info h1{
+  font-size:26px;
+  margin-bottom:8px;
+}
+
+.header-info p{
+  font-size:14px;
+  margin-top:5px;
+}
+
+.main-nav{
+  background:#062e59;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.main-nav a{
+  color:white;
+  text-decoration:none;
+  padding:14px 17px;
+  font-size:14px;
+}
+
+.main-nav a:hover{
+  background:#087e9c;
+}
+
+.nasha-bar{
+  background:#fff2e5;
+  padding:12px;
+  text-align:center;
+  border-bottom:2px solid #ff9a38;
+}
+
+.nasha-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  color:#c62828;
+  text-decoration:none;
+  font-weight:bold;
+  font-size:16px;
+}
+
+.nasha-icon{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:#d62828;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+  animation:nashaBlink 1s infinite;
+  box-shadow:0 0 12px #e57373;
+}
+
+@keyframes nashaBlink{
+  0%,100%{
+    opacity:1;
+    transform:scale(1);
+  }
+  50%{
+    opacity:.4;
+    transform:scale(1.12);
+  }
+}
+
+@media(max-width:600px){
+  .header-info h1{
+    font-size:19px;
+  }
+
+  .header-emblem{
+    font-size:35px;
+  }
+
+  .header-info p{
+    font-size:12px;
+  }
+
+  .main-nav a{
+    padding:11px 9px;
+    font-size:12px;
+  }
+
+  .nasha-link{
+    font-size:13px;
+  }
+}
+</style>
