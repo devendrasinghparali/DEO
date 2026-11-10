@@ -122,7 +122,7 @@
 
       lockedSchool = { blockName: block, aeoCluster: aeo, schoolName: school, diseCode: dise };
       
-      document.getElementById('displaySchoolInfo3').innerText = `${school} (DISE: ${dise})`; // Fix syntax or keep clean innerHTML
+      // यहाँ त्रुटि ठीक कर दी गई है
       document.getElementById('displaySchoolInfo').innerText = `${school} [डाइज: ${dise}]`;
       
       document.getElementById('schoolSection').style.display = 'none';
@@ -162,7 +162,6 @@
       .then(() => {
           document.getElementById('successMessage').innerText = `✅ "${studentName}" की जानकारी सफलतापूर्वक जुड़ गई! अगला छात्र जोड़ें।`;
           
-          // केवल बच्चों के फॉर्म रीसेट होंगे, स्कूल का डेटा लॉक ही रहेगा
           document.getElementById('studentName').value = '';
           document.getElementById('fatherName').value = '';
           document.getElementById('motherName').value = '';
