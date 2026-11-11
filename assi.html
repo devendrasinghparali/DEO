@@ -133,10 +133,20 @@ title: deo MP School Guide
   }
 
   // टेस्ट शुरू करना और प्रश्न रेंडर करना
-  function startTest() {
+    async function startTest() {
       selectedStudentId = document.getElementById('studentSelect').value;
       if(!selectedStudentId) {
           alert("कृपया सूची में से अपना नाम चुनें!");
+          return;
+      }
+
+      // Check karein ki kya ye bachha pehle test de chuka hai
+      const existingTest = await db.collection("assessments")
+          .where("studentId", "==", selectedStudentId)
+          .get();
+
+      if (!existingTest.empty) {
+          alert("⚠️ इस छात्र द्वारा मूल्यांकन पहले ही पूरा किया जा चुका है। एक छात्र दोबारा टेस्ट नहीं दे सकता!");
           return;
       }
 
