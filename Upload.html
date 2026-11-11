@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>Mandsaur Portal - CSV to Firebase Uploader</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body style="font-family: Arial, sans-serif; padding: 30px; background: #f4f7f6;">
+    <div style="max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <h2>फायरबेस स्टूडेंट डेटा इम्पोर्ट टूल</h2>
+        <p>अपनी <b>Sankul Wise Admission Report</b> वाली CSV फाइल चुनें:</p>
+        
+        <input type="file" id="csvFile" accept=".csv" style="margin: 15px 0;"><br><br>
+        
+        <button onclick="startUpload()" style="padding: 12px 25px; font-size: 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">अपलोड शुरू करें</button>
+        
+        <h3 id="status" style="margin-top: 20px; color: #333;"></h3>
+    </div>
+
+    <script>
+        // Aapka asli Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFgXs1IxALTNoZXgxEW6MkSrq-Q7dguhw",
+            authDomain: "mandsaur-nashamukt.firebaseapp.com",
+            projectId: "mandsaur-nashamukt",
+            storageBucket: "mandsaur-nashamukt.firebasestorage.app",
+            messagingSenderId: "786976421007",
+            appId: "1:786976421007:web:867af9a4f5c72d2a772cfa",
+            measurementId: "G-LQM8SBLMF8"
+        };
+
+        // Firebase initialize karein
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function startUpload() {
+            const fileInput = document.getElementById('csvFile');
+            if(fileInput.files.length === 0) {
+                alert("Kripya pehle CSV file chunein!");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n');
+                const statusEl = document.getElementById('status');
+                statusEl.innerText = "Upload shuru ho gaya hai, kripya intezaar karein...";
+
+                let successCount = 0;
+                
+                // Batch-wise upload ya ek-ek karke bhejenge taaki server par load na aaye
+                for(let i = 1; i < rows.length; i++) {
+                    let rowText = rows[i].trim();
+                    if(!rowText) continue;
+                    
+                    // Simple CSV columns parsing
+                    let vals = rowText.split(',');
+                    if(vals.length >= 8) {
+                        let studentData = {
+                            blockName: vals[1] ? vals[1].trim() : "",
+                            aeoCluster: vals[2] ? vals[2].trim() : "",
+                            schoolName: vals[3] ? vals[3].trim() : "",
+                            studentName: vals[4] ? vals[4].trim() : "",
+                            fatherName: vals[5] ? vals[5].trim() : "",
+                            studentClass: vals[6] ? vals[6].trim() : "",
+                            Gender: vals[7] ? vals[7].trim() : "",
+                            diseCode: vals[8] ? vals[8].trim() : ""
+                        };
+
+                        try {
+                            await db.collection("students").add(studentData);
+                            successCount++;
+                            if(successCount % 50 === 0) {
+                                statusEl.innerText = `Uploaded: ${successCount} records...`;
+                            }
+                        } catch (err) {
+                            console.error("Error at row " + i, err);
+                        }
+                    }
+                }
+                statusEl.innerText = `Safaralpurvak ${successCount} records upload ho gaye hain!`;
+                alert("Sabhi students ka data successfully database mein chala gaya hai!");
+            };
+
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
