@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEO मॉनिटरिंग डैशबोर्ड - मंदसौर नशा मुक्ति पोर्टल</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { background: #dc3545; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #c82333; }
+        
+        #dashboardContent { display: none; }
+        .stats-box { display: flex; gap: 15px; margin-bottom: 20px; }
+        .stat-card { flex: 1; background: #e9ecef; padding: 15px; border-radius: 6px; text-align: center; }
+        .stat-card h3 { margin: 0 0 10px 0; color: #007bff; font-size: 22px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        
+        .back-link { display: block; text-align: center; margin-top: 20px; text-decoration: none; color: #007bff; }
+        #loginError { color: red; text-align: center; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📊 DEO / जिला मॉनिटरिंग डैशबोर्ड</h2>
+
+    <!-- ईमेल लॉगिन सेक्शन -->
+    <div id="loginSection">
+        <div class="form-group">
+            <label for="emailInput">ऑफिसर ईमेल आईडी:</label>
+            <input type="email" id="emailInput" placeholder="deo@mp.gov.in">
+        </div>
+        <div class="form-group">
+            <label for="passwordInput">पासवर्ड:</label>
+            <input type="password" id="passwordInput" placeholder="पासवर्ड दर्ज करें">
+        </div>
+        <button type="button" onclick="loginWithEmail()">ईमेल से लॉगिन करें</button>
+        <div id="loginError"></div>
+    </div>
+
+    <!-- डैशबोर्ड मुख्य सामग्री -->
+    <div id="dashboardContent">
+        <div class="stats-box">
+            <div class="stat-card">
+                <h3 id="totalStudentsCount">0</h3>
+                <p>कुल पंजीकृत छात्र</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalAssessmentsCount">0</h3>
+                <p>संपन्न टेस्ट</p>
+            </div>
+        </div>
+
+        <h3 style="color: #333; border-bottom: 2px solid #ddd; padding-bottom: 5px;">छात्र मूल्यांकन रिपोर्ट</h3>
+        
+        <div style="overflow-x: auto;">
+            <table id="reportTable">
+                <thead>
+                    <tr>
+                        <th>ब्लॉक</th>
+                        <th>संकुल (AEO)</th>
+                        <th>स्कूल नाम</th>
+                        <th>छात्र का नाम</th>
+                        <th>कक्षा</th>
+                        <th>प्राप्तांक</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- डेटा यहाँ जुड़ेगा -->
+                </tbody>
+            </table>
+        </div>
+
+        <button onclick="logout()" style="background: #6c757d; margin-top: 20px;">लॉग आउट करें</button>
+    </div>
+
+    <a href="index.html" class="back-link">← होमपेज पर वापस जाएं</a>
+</div>
+
+<!-- Firebase SDKs (Auth सहित) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFgxs1IxALTNoZXgxEW6MKSrq-Q7dguhw",
+    authDomain: "mandsaur-nashamukt.firebaseapp.com",
+    projectId: "mandsaur-nashamukt",
+    storageBucket: "mandsaur-nashamukt.appspot.com",
+    messagingSenderId: "786976421007",
+    appId: "1:786976421007:web:867af9a4f5c72d2a772cfa"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  // ईमेल और पासवर्ड से लॉगिन करने का फंक्शन
+  function loginWithEmail() {
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value.trim();
+      const errorDiv = document.getElementById('loginError');
+
+      if(!email || !password) {
+          errorDiv.innerText = "कृपया ईमेल और पासवर्ड दोनों दर्ज करें!";
+          return;
+      }
+
+      auth.signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+          // लॉगिन सफल होने पर डैशबोर्ड दिखाएं
+          document.getElementById('loginSection').style.display = 'none';
+          document.getElementById('dashboardContent').style.display = 'block';
+          loadDashboardData();
+      })
+      .catch((error) => {
+          errorDiv.innerText = "लॉगिन असफल: " + error.message;
+      });
+  }
+
+  // लॉग आउट फंक्शन
+  function logout() {
+      auth.signOut().then(() => {
+          location.reload();
+      });
+  }
+
+  function loadDashboardData() {
+      db.collection("students").get().then((snap) => {
+          document.getElementById('totalStudentsCount').innerText = snap.size;
+      });
+
+      db.collection("assessments").orderBy("submittedAt", "desc").get().then((querySnapshot) => {
+          document.getElementById('totalAssessmentsCount').innerText = querySnapshot.size;
+          const tbody = document.getElementById('tableBody');
+          tbody.innerHTML = '';
+
+          if(querySnapshot.empty) {
+              tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">अभी तक कोई टेस्ट डेटा उपलब्ध नहीं है।</td></tr>';
+              return;
+          }
+
+          querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              const sDetails = data.studentDetails || {};
+              
+              let tr = document.createElement('tr');
+              tr.innerHTML = `
+                  <td>${sDetails.blockName || '-'}</td>
+                  <td>${sDetails.aeoCluster || '-'}</td>
+                  <td>${sDetails.schoolName || '-'} (डाइज: ${sDetails.diseCode || '-'})</td>
+                  <td>${sDetails.studentName || 'अज्ञात'}</td>
+                  <td>${sDetails.studentClass || '-'}</td>
+                  <td><b>${data.score} / ${data.totalQuestions}</b></td>
+              `;
+              tbody.appendChild(tr);
+          });
+      });
+  }
+</script>
+
+</body>
+</html>
