@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEO मॉनिटरिंग लॉगिन - मंदसौर नशा मुक्ति पोर्टल</title>
+    <style>
+        :root {
+            --primary: #ea580c;
+            --primary-dark: #c2410c;
+            --primary-light: #ffedd5;
+            --accent-green: #10b981;
+            --bg-body: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #9a3412, var(--primary));
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+        }
+        .navbar h1 { margin: 0; font-size: 19px; font-weight: 700; }
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 7px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .btn-logout:hover { background: white; color: var(--primary-dark); }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* लॉगिन कार्ड */
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            padding: 35px 30px;
+            border-radius: 14px;
+            border-top: 5px solid var(--primary);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        }
+        .login-card h2 {
+            margin: 0 0 6px 0;
+            color: var(--primary-dark);
+            text-align: center;
+            font-size: 22px;
+        }
+        .login-card p.subtitle {
+            margin: 0 0 24px 0;
+            text-align: center;
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 13.5px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+        .form-control {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14.5px;
+            transition: 0.2s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15.5px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+            transition: 0.2s;
+        }
+        .btn-login:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(234, 88, 12, 0.35); }
+
+        /* रिपोर्ट चयन पैनल (लॉगिन के बाद दिखने वाला) */
+        .selection-container {
+            width: 100%;
+            max-width: 850px;
+            display: none;
+        }
+        .welcome-banner {
+            background: white;
+            padding: 22px 26px;
+            border-radius: 12px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .welcome-banner h2 { margin: 0; font-size: 20px; color: var(--text-main); }
+        .welcome-banner p { margin: 4px 0 0 0; font-size: 13.5px; color: var(--text-muted); }
+
+        .stats-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .mini-stat {
+            background: var(--primary-light);
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .mini-stat strong { display: block; font-size: 18px; color: var(--primary-dark); }
+        .mini-stat span { font-size: 11.5px; color: #7c2d12; font-weight: 600; }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 22px;
+        }
+        .report-option-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 28px 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+        .report-option-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(234, 88, 12, 0.14);
+        }
+        .icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 18px;
+        }
+        .icon-circle.green {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .report-option-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 19px;
+            color: var(--text-main);
+        }
+        .report-option-card p {
+            margin: 0 0 20px 0;
+            font-size: 13.5px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .open-link {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .report-option-card:hover .open-link { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>📊 मंदसौर नशा मुक्ति अभियान - मॉनिटरिंग पोर्टल</h1>
+    <button id="navLogoutBtn" class="btn-logout" style="display: none;" onclick="logout()">लॉग आउट</button>
+</nav>
+
+<div class="main-wrapper">
+    <!-- 1. लॉगिन बॉक्स -->
+    <div id="loginCard" class="login-card">
+        <h2>ऑफिसर लॉगिन</h2>
+        <p class="subtitle">जिला एवं विकासखण्ड स्तरीय मॉनिटरिंग डैशबोर्ड</p>
+        
+        <div class="form-group">
+            <label>ऑफिसर ईमेल आईडी:</label>
+            <input type="email" id="emailInput" class="form-control" placeholder="example@gmail.com">
+        </div>
+        <div class="form-group">
+            <label>पासवर्ड:</label>
+            <input type="password" id="passwordInput" class="form-control" placeholder="पासवर्ड दर्ज करें">
+        </div>
+        <button class="btn-login" onclick="loginWithEmail()">लॉगिन करें →</button>
+        <p id="loginError" style="color: #dc2626; font-size: 13px; text-align: center; margin-top: 12px; font-weight: 600;"></p>
+        
+        <div style="text-align: center; margin-top: 18px;">
+            <a href="index.html" style="color: var(--primary-dark); text-decoration: none; font-size: 13.5px; font-weight: 600;">← मुख्य पोर्टल पर वापस जाएं</a>
+        </div>
+    </div>
+
+    <!-- 2. रिपोर्ट चुनने का सेक्शन (लॉगिन के तुरंत बाद दिखेगा) -->
+    <div id="selectionSection" class="selection-container">
+        <div class="welcome-banner">
+            <div>
+                <h2>स्वागत है! आप कौन सी रिपोर्ट देखना चाहते हैं?</h2>
+                <p id="loggedUserEmail">लॉगिन सफल</p>
+            </div>
+            <div class="stats-row">
+                <div class="mini-stat">
+                    <strong id="totalRegStat">...</strong>
+                    <span>कुल पंजीकृत छात्र</span>
+                </div>
+                <div class="mini-stat" style="background: #dcfce7;">
+                    <strong id="totalTestStat" style="color: #15803d;">...</strong>
+                    <span style="color: #166534;">संपन्न टेस्ट</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cards-grid">
+            <!-- विकल्प 1: पंजीकृत छात्र -->
+            <a href="registered_report-v2.html" class="report-option-card">
+                <div>
+                    <div class="icon-circle">👨‍🎓</div>
+                    <h3>1. पंजीकृत छात्र रिपोर्ट (Registered Students)</h3>
+                    <p>ब्लॉक, संकुल (AEO), स्कूल और कक्षा के अनुसार कुल पंजीकृत छात्रों की सूची देखें और Excel में डाउनलोड करें।</p>
+                </div>
+                <span class="open-link">पंजीकृत रिपोर्ट खोलें →</span>
+            </a>
+
+            <!-- विकल्प 2: टेस्ट देने वाले छात्र -->
+            <a href="assessment_report-v2.html" class="report-option-card">
+                <div>
+                    <div class="icon-circle green">✅</div>
+                    <h3>2. संपन्न टेस्ट रिपोर्ट (Assessment Report)</h3>
+                    <p>जिन छात्रों ने नशा मुक्ति प्रश्नोत्तरी (Test) पूर्ण कर ली है, उनके प्राप्तांक (Score) देखें और Excel डाउनलोड करें।</p>
+                </div>
+                <span class="open-link" style="color: #15803d;">टेस्ट रिपोर्ट खोलें →</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBFgXs1IxALTNoZXgxEW6MkSrq-Q7dguhw",
+        authDomain: "mandsaur-nashamukt.firebaseapp.com",
+        projectId: "mandsaur-nashamukt",
+        storageBucket: "mandsaur-nashamukt.firebasestorage.app",
+        messagingSenderId: "786976421007",
+        appId: "1:786976421007:web:867af9a4f5c72d2a772cfa",
+        measurementId: "G-LQM8SBLMF8"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('selectionSection').style.display = 'block';
+            document.getElementById('navLogoutBtn').style.display = 'block';
+            document.getElementById('loggedUserEmail').innerText = "लॉगिन आईडी: " + user.email;
+            loadQuickCounts();
+        } else {
+            document.getElementById('loginCard').style.display = 'block';
+            document.getElementById('selectionSection').style.display = 'none';
+            document.getElementById('navLogoutBtn').style.display = 'none';
+        }
+    });
+
+    async function loadQuickCounts() {
+        try {
+            const sSnap = await db.collection("students").count().get();
+            document.getElementById('totalRegStat').innerText = sSnap.data().count.toLocaleString('en-IN');
+            const aSnap = await db.collection("assessments").count().get();
+            document.getElementById('totalTestStat').innerText = aSnap.data().count.toLocaleString('en-IN');
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function loginWithEmail() {
+        const email = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passwordInput').value.trim();
+        const errEl = document.getElementById('loginError');
+
+        if (!email || !password) {
+            errEl.innerText = "कृपया ईमेल और पासवर्ड दोनों दर्ज करें!";
+            return;
+        }
+        errEl.innerText = "कृपया प्रतीक्षा करें, लॉगिन हो रहा है...";
+        auth.signInWithEmailAndPassword(email, password).catch(err => {
+            errEl.innerText = "लॉगिन असफल: " + err.message;
+        });
+    }
+
+    function logout() {
+        auth.signOut();
+    }
+</script>
+
+</body>
+</html>
