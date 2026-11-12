@@ -335,7 +335,7 @@
 
         try {
             // 1. सभी पंजीकृत छात्र एक साथ लोड करके ब्लॉक के हिसाब से गिनना
-            const regSnap = await db.collection("students").limit(10000).get();
+            const regSnap = await db.collection("students").get();
             regSnap.forEach(doc => {
                 const b = doc.data().blockName;
                 if (blockData[b]) {
@@ -349,7 +349,7 @@
 
         try {
             // 2. सभी संपन्न टेस्ट एक साथ लोड करके ब्लॉक के हिसाब से गिनना
-            const testSnap = await db.collection("assessments").limit(100000).get();
+            const testSnap = await db.collection("assessments").get();
             testSnap.forEach(doc => {
                 const s = doc.data().studentDetails || {};
                 const b = s.blockName;
