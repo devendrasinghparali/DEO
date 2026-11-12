@@ -349,7 +349,7 @@
 
         try {
             // 2. सभी संपन्न टेस्ट एक साथ लोड करके ब्लॉक के हिसाब से गिनना
-            const testSnap = await db.collection("assessments").limit(10000).get();
+            const testSnap = await db.collection("assessments").limit(100000).get();
             testSnap.forEach(doc => {
                 const s = doc.data().studentDetails || {};
                 const b = s.blockName;
