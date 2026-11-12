@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>पंजीकृत छात्र रिपोर्ट - मंदसौर नशा मुक्ति पोर्टल</title>
+    <title>संपन्न टेस्ट रिपोर्ट - मंदसौर नशा मुक्ति पोर्टल</title>
     <style>
         :root {
             --primary: #ea580c;
@@ -187,23 +187,22 @@
 
 <nav class="navbar">
     <div class="nav-brand">
-        <span class="nav-badge">पंजीकृत रिपोर्ट</span>
+        <span class="nav-badge">संपन्न टेस्ट रिपोर्ट</span>
         <h1 class="nav-title">मंदसौर नशा मुक्ति पोर्टल</h1>
     </div>
     <div class="nav-links">
         <a href="admin_login.html" class="nav-btn">🏠 रिपोर्ट मेनू</a>
-        <a href="registered_report-v2.html" class="nav-btn active">👨‍🎓 पंजीकृत छात्र</a>
-        <a href="assessment_report-v2.html" class="nav-btn">✅ संपन्न टेस्ट रिपोर्ट</a>
+        <a href="registered_report-v2.html" class="nav-btn">👨‍🎓 पंजीकृत छात्र</a>
+        <a href="assessment_report-v2.html" class="nav-btn active">✅ संपन्न टेस्ट रिपोर्ट</a>
         <button class="nav-btn" onclick="logout()">लॉग आउट</button>
     </div>
 </nav>
 
-<!-- मुख्य कंटेनर को शुरू में ही visible रखा है ताकि लॉगिन चेक की दिक्कत न आए -->
 <div class="container" id="mainContent">
     
     <!-- फ़िल्टर कार्ड -->
     <div class="fieldset-card">
-        <span class="fieldset-legend">Student Details Report (फ़िल्टर)</span>
+        <span class="fieldset-legend">Student Assessment Report (फ़िल्टर)</span>
         <div class="filter-grid">
             <div class="form-group">
                 <label>ब्लॉक (Block) चुनें:</label>
@@ -252,12 +251,12 @@
     <!-- लोडिंग चकरा -->
     <div id="loaderBox">
         <div class="spinner"></div>
-        <p id="loaderMsg" style="margin: 0; font-weight: 600; color: #c2410c;">डेटा लोड हो रहा है, कृपया प्रतीक्षा करें...</p>
+        <p id="loaderMsg" style="margin: 0; font-weight: 600; color: #c2410c;">टेस्ट रिपोर्ट लोड हो रही है, कृपया प्रतीक्षा करें...</p>
     </div>
 
     <!-- टेबल सेक्शन -->
     <div id="resultCard" class="fieldset-card" style="display: none;">
-        <span class="fieldset-legend">Registered Student List</span>
+        <span class="fieldset-legend">Assessment Completed Student List</span>
         
         <div class="table-toolbar">
             <div class="toolbar-left">
@@ -284,8 +283,8 @@
                         <th>DISE Code</th>
                         <th>Student Name</th>
                         <th>Father Name</th>
-                        <th>Gender</th>
                         <th>Class</th>
+                        <th>Score (प्राप्तांक)</th>
                         <th>School Name</th>
                         <th>Block</th>
                     </tr>
@@ -338,7 +337,7 @@
     }
 
     function showLoader(msg) {
-        document.getElementById('loaderMsg').innerText = msg || "डेटा लोड हो रहा है, कृपया प्रतीक्षा करें...";
+        document.getElementById('loaderMsg').innerText = msg || "टेस्ट रिपोर्ट लोड हो रही है, कृपया प्रतीक्षा करें...";
         document.getElementById('loaderBox').style.display = 'block';
     }
 
@@ -413,19 +412,31 @@
         const cls = document.getElementById('classFilter').value;
 
         document.getElementById('resultCard').style.display = 'none';
-        showLoader("पंजीकृत छात्रों का डेटा लोड हो रहा है...");
+        showLoader("टेस्ट देने वाले छात्रों का डेटा लोड हो रहा है...");
 
         try {
-            let query = db.collection("students");
-            if (block !== "ALL") query = query.where("blockName", "==", block);
-            if (aeo !== "ALL") query = query.where("aeoCluster", "==", aeo);
-            if (school !== "ALL") query = query.where("schoolName", "==", school);
-            if (cls !== "ALL") query = query.where("studentClass", "==", cls);
+            let query = db.collection("assessments");
+            if (block !== "ALL") query = query.where("studentDetails.blockName", "==", block);
+            if (aeo !== "ALL") query = query.where("studentDetails.aeoCluster", "==", aeo);
+            if (school !== "ALL") query = query.where("studentDetails.schoolName", "==", school);
+            if (cls !== "ALL") query = query.where("studentDetails.studentClass", "==", cls);
 
             const snap = await query.limit(5000).get();
             allFetchedRecords = [];
             snap.forEach(doc => {
-                allFetchedRecords.push(doc.data());
+                const data = doc.data();
+                const s = data.studentDetails || {};
+                allFetchedRecords.push({
+                    diseCode: s.diseCode || '-',
+                    studentName: s.studentName || 'अज्ञात',
+                    fatherName: s.fatherName || '-',
+                    studentClass: s.studentClass || '-',
+                    score: data.score || 0,
+                    totalQuestions: data.totalQuestions || 0,
+                    schoolName: s.schoolName || '-',
+                    aeoCluster: s.aeoCluster || '-',
+                    blockName: s.blockName || '-'
+                });
             });
 
             document.getElementById('quickSearchInput').value = '';
@@ -508,13 +519,13 @@
             let tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${startIdx + i + 1}</td>
-                <td>${d.diseCode || '-'}</td>
-                <td><b>${d.studentName || '-'}</b></td>
-                <td>${d.fatherName || '-'}</td>
-                <td>${d.Gender || '-'}</td>
-                <td>${d.studentClass || '-'}</td>
-                <td>${d.schoolName || '-'}</td>
-                <td>${d.blockName || '-'}</td>
+                <td>${d.diseCode}</td>
+                <td><b>${d.studentName}</b></td>
+                <td>${d.fatherName}</td>
+                <td>${d.studentClass}</td>
+                <td><span style="background:#dcfce7; color:#166534; padding:3px 9px; border-radius:12px; font-weight:700;">${d.score} / ${d.totalQuestions}</span></td>
+                <td>${d.schoolName}</td>
+                <td>${d.blockName}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -527,7 +538,7 @@
         }
         const BOM = "\uFEFF";
         let rows = [
-            ["Sr.No.", "DISE Code", "Student Name", "Father Name", "Gender", "Class", "School Name", "AEO Cluster", "Block Name"].join(",")
+            ["Sr.No.", "DISE Code", "Student Name", "Father Name", "Class", "Score", "Total Questions", "School Name", "AEO Cluster", "Block Name"].join(",")
         ];
 
         filteredRecords.forEach((d, idx) => {
@@ -536,8 +547,9 @@
                 `"${(d.diseCode || '').toString().replace(/"/g, '""')}"`,
                 `"${(d.studentName || '').replace(/"/g, '""')}"`,
                 `"${(d.fatherName || '').replace(/"/g, '""')}"`,
-                `"${(d.Gender || '').replace(/"/g, '""')}"`,
                 `"${(d.studentClass || '').replace(/"/g, '""')}"`,
+                d.score,
+                d.totalQuestions,
                 `"${(d.schoolName || '').replace(/"/g, '""')}"`,
                 `"${(d.aeoCluster || '').replace(/"/g, '""')}"`,
                 `"${(d.blockName || '').replace(/"/g, '""')}"`
@@ -547,7 +559,7 @@
         const blob = new Blob([BOM + rows.join("\n")], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `Registered_Students_Report.csv`;
+        link.download = `Assessment_Completed_Report.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
