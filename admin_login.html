@@ -114,10 +114,10 @@
         }
         .btn-login:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(234, 88, 12, 0.35); }
 
-        /* रिपोर्ट चयन पैनल (लॉगिन के बाद दिखने वाला) */
+        /* रिपोर्ट चयन एवं समरी पैनल */
         .selection-container {
             width: 100%;
-            max-width: 850px;
+            max-width: 950px;
             display: none;
         }
         .welcome-banner {
@@ -154,12 +154,13 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
             gap: 22px;
+            margin-bottom: 24px;
         }
         .report-option-card {
             background: white;
             border: 2px solid #e2e8f0;
             border-radius: 14px;
-            padding: 28px 24px;
+            padding: 24px 20px;
             text-decoration: none;
             color: inherit;
             transition: all 0.25s ease;
@@ -170,45 +171,42 @@
         }
         .report-option-card:hover {
             border-color: var(--primary);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(234, 88, 12, 0.14);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(234, 88, 12, 0.12);
         }
         .icon-circle {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             background: var(--primary-light);
             color: var(--primary-dark);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            margin-bottom: 18px;
+            font-size: 24px;
+            margin-bottom: 14px;
         }
-        .icon-circle.green {
-            background: #dcfce7;
-            color: #15803d;
+        .icon-circle.green { background: #dcfce7; color: #15803d; }
+        .report-option-card h3 { margin: 0 0 6px 0; font-size: 17px; color: var(--text-main); }
+        .report-option-card p { margin: 0 0 16px 0; font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+        .open-link { font-weight: 700; font-size: 13.5px; color: var(--primary); display: inline-flex; align-items: center; gap: 6px; }
+
+        /* ब्लॉक वार समरी टेबल कार्ड */
+        .summary-card {
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
         }
-        .report-option-card h3 {
-            margin: 0 0 8px 0;
-            font-size: 19px;
-            color: var(--text-main);
-        }
-        .report-option-card p {
-            margin: 0 0 20px 0;
-            font-size: 13.5px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-        .open-link {
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--primary);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .report-option-card:hover .open-link { text-decoration: underline; }
+        .summary-card h3 { margin: 0 0 14px 0; font-size: 17px; color: var(--primary-dark); border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+        
+        .table-wrapper { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+        th { background: #f1f5f9; color: #334155; padding: 10px 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #cbd5e1; }
+        td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+        tr:hover { background-color: #f8fafc; }
+        .total-row { font-weight: 700; background: #fff7ed; }
     </style>
 </head>
 <body>
@@ -240,7 +238,7 @@
         </div>
     </div>
 
-    <!-- 2. रिपोर्ट चुनने का सेक्शन (लॉगिन के तुरंत बाद दिखेगा) -->
+    <!-- 2. रिपोर्ट चयन और ब्लॉक वार समरी सेक्शन -->
     <div id="selectionSection" class="selection-container">
         <div class="welcome-banner">
             <div>
@@ -264,8 +262,8 @@
             <a href="registered_report-v2.html" class="report-option-card">
                 <div>
                     <div class="icon-circle">👨‍🎓</div>
-                    <h3>1. पंजीकृत छात्र रिपोर्ट (Registered Students)</h3>
-                    <p>ब्लॉक, संकुल (AEO), स्कूल और कक्षा के अनुसार कुल पंजीकृत छात्रों की सूची देखें और Excel में डाउनलोड करें।</p>
+                    <h3>1. पंजीकृत छात्र रिपोर्ट</h3>
+                    <p>ब्लॉक, संकुल, स्कूल और कक्षा के अनुसार कुल पंजीकृत छात्रों की सूची देखें और Excel डाउनलोड करें।</p>
                 </div>
                 <span class="open-link">पंजीकृत रिपोर्ट खोलें →</span>
             </a>
@@ -274,11 +272,31 @@
             <a href="assessment_report-v2.html" class="report-option-card">
                 <div>
                     <div class="icon-circle green">✅</div>
-                    <h3>2. संपन्न टेस्ट रिपोर्ट (Assessment Report)</h3>
-                    <p>जिन छात्रों ने नशा मुक्ति प्रश्नोत्तरी (Test) पूर्ण कर ली है, उनके प्राप्तांक (Score) देखें और Excel डाउनलोड करें।</p>
+                    <h3>2. संपन्न टेस्ट रिपोर्ट</h3>
+                    <p>जिन छात्रों ने प्रश्नोत्तरी पूर्ण कर ली है, उनके प्राप्तांक (Score) देखें और Excel डाउनलोड करें।</p>
                 </div>
                 <span class="open-link" style="color: #15803d;">टेस्ट रिपोर्ट खोलें →</span>
             </a>
+        </div>
+
+        <!-- ब्लॉक वार संख्या देखने का टेबल -->
+        <div class="summary-card">
+            <h3>📍 ब्लॉक-वार प्रगति संख्या (District & Block Summary)</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>क्रम.</th>
+                            <th>विकासखण्ड (Block Name)</th>
+                            <th>पंजीकृत छात्र संख्या</th>
+                            <th>संपन्न टेस्ट संख्या</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTableBody">
+                        <tr><td colspan="4" style="text-align: center; color: #64748b; padding: 20px;">डेटा लोड हो रहा है...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -302,13 +320,15 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    const blocksList = ["Mandsaur", "Malhargarh", "Sitamau", "Garoth", "Bhanpura"];
+
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             document.getElementById('loginCard').style.display = 'none';
             document.getElementById('selectionSection').style.display = 'block';
             document.getElementById('navLogoutBtn').style.display = 'block';
             document.getElementById('loggedUserEmail').innerText = "लॉगिन आईडी: " + user.email;
-            loadQuickCounts();
+            loadDistrictSummary();
         } else {
             document.getElementById('loginCard').style.display = 'block';
             document.getElementById('selectionSection').style.display = 'none';
@@ -316,15 +336,54 @@
         }
     });
 
-    async function loadQuickCounts() {
-        try {
-            const sSnap = await db.collection("students").count().get();
-            document.getElementById('totalRegStat').innerText = sSnap.data().count.toLocaleString('en-IN');
-            const aSnap = await db.collection("assessments").count().get();
-            document.getElementById('totalTestStat').innerText = aSnap.data().count.toLocaleString('en-IN');
-        } catch (e) {
-            console.error(e);
+    async function loadDistrictSummary() {
+        let totalReg = 0;
+        let totalTest = 0;
+        let summaryRowsHtml = "";
+
+        // ब्लॉक वार डेटा फेच करना
+        for (let i = 0; i < blocksList.length; i++) {
+            const bName = blocksList[i];
+            let regCount = 0;
+            let testCount = 0;
+
+            try {
+                // पंजीकृत छात्रों की गिनती
+                const regSnap = await db.collection("students").where("blockName", "==", bName).get();
+                regCount = regSnap.size;
+                totalReg += regCount;
+
+                // संपन्न टेस्ट की गिनती
+                const testSnap = await db.collection("assessments").where("studentDetails.blockName", "==", bName).get();
+                testCount = testSnap.size;
+                totalTest += testCount;
+            } catch (err) {
+                console.error(`Error loading ${bName}:`, err);
+            }
+
+            summaryRowsHtml += `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td><b>${bName}</b></td>
+                    <td>${regCount.toLocaleString('en-IN')}</td>
+                    <td><span style="color: #15803d; font-weight: 700;">${testCount.toLocaleString('en-IN')}</span></td>
+                </tr>
+            `;
         }
+
+        // कुल योग की पंक्ति (Total Row)
+        summaryRowsHtml += `
+            <tr class="total-row">
+                <td>-</td>
+                <td><b>संपूर्ण जिला कुल (Total District)</b></td>
+                <td><b>${totalReg.toLocaleString('en-IN')}</b></td>
+                <td><b style="color: #15803d;">${totalTest.toLocaleString('en-IN')}</b></td>
+            </tr>
+        `;
+
+        document.getElementById('totalRegStat').innerText = totalReg.toLocaleString('en-IN');
+        document.getElementById('totalTestStat').innerText = totalTest.toLocaleString('en-IN');
+        document.getElementById('summaryTableBody').innerHTML = summaryRowsHtml;
     }
 
     function loginWithEmail() {
