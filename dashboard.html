@@ -5,36 +5,223 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEO मॉनिटरिंग डैशबोर्ड - मंदसौर नशा मुक्ति पोर्टल</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { background: #dc3545; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #c82333; }
-        
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #0f172a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* हेडर स्टाइल */
+        .header {
+            background: linear-gradient(135deg, var(--primary), #1d4ed8);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 { margin: 0; font-size: 22px; font-weight: 600; }
+        .header p { margin: 4px 0 0 0; font-size: 13px; opacity: 0.9; }
+
+        .container {
+            max-width: 1200px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+
+        /* लॉगिन कार्ड */
+        .login-card {
+            max-width: 420px;
+            margin: 60px auto;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+        .login-card h2 { text-align: center; color: var(--primary); margin-top: 0; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+        .form-group input, .filter-select {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .btn {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary { background: var(--primary); color: white; width: 100%; font-size: 16px; }
+        .btn-primary:hover { background: #1e40af; }
+        .btn-search { background: var(--primary-light); color: white; }
+        .btn-search:hover { background: #2563eb; }
+        .btn-excel-reg { background: #059669; color: white; }
+        .btn-excel-reg:hover { background: #047857; }
+        .btn-excel-test { background: #d97706; color: white; }
+        .btn-excel-test:hover { background: #b45309; }
+        .btn-logout { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); }
+        .btn-logout:hover { background: rgba(255,255,255,0.3); }
+
         #dashboardContent { display: none; }
-        .stats-box { display: flex; gap: 15px; margin-bottom: 20px; }
-        .stat-card { flex: 1; background: #e9ecef; padding: 15px; border-radius: 6px; text-align: center; }
-        .stat-card h3 { margin: 0 0 10px 0; color: #007bff; font-size: 22px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
-        th { background-color: #007bff; color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        
-        .back-link { display: block; text-align: center; margin-top: 20px; text-decoration: none; color: #007bff; }
-        #loginError { color: red; text-align: center; font-weight: bold; margin-top: 10px; }
+
+        /* स्टैट्स कार्ड्स */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border-left: 5px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .stat-card.green { border-left-color: var(--success); }
+        .stat-card.orange { border-left-color: var(--warning); }
+        .stat-info h3 { margin: 0; font-size: 28px; color: var(--secondary); }
+        .stat-info p { margin: 5px 0 0 0; font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        .stat-icon { font-size: 32px; opacity: 0.8; }
+
+        /* फिल्टर सेक्शन */
+        .filter-panel {
+            background: var(--card-bg);
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            margin-bottom: 25px;
+        }
+        .filter-panel h3 { margin-top: 0; font-size: 16px; color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        .action-bar {
+            margin-top: 18px;
+            padding-top: 15px;
+            border-top: 1px dashed #cbd5e1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* लोडिंग स्पिनर */
+        #loader {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid var(--primary-light);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* टेबल सेक्शन */
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        .table-header {
+            padding: 18px 22px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-header h3 { margin: 0; font-size: 16px; color: var(--secondary); }
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 16px; text-align: left; font-size: 13.5px; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f1f5f9; color: var(--secondary); font-weight: 600; white-space: nowrap; }
+        tr:hover { background-color: #f8fafc; }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        #loginError { color: var(--danger); text-align: center; font-weight: 600; margin-top: 12px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>📊 DEO / जिला मॉनिटरिंग डैशबोर्ड</h2>
+<div class="header">
+    <div>
+        <h1>📊 जिला मॉनिटरिंग डैशबोर्ड (DEO पोर्टल)</h1>
+        <p>नशा मुक्ति अभियान - मंदसौर (मध्य प्रदेश)</p>
+    </div>
+    <div id="headerActions" style="display: none;">
+        <button class="btn btn-logout" onclick="logout()">लॉग आउट</button>
+    </div>
+</div>
 
+<div class="container">
     <!-- ईमेल लॉगिन सेक्शन -->
-    <div id="loginSection">
+    <div id="loginSection" class="login-card">
+        <h2>ऑफिसर लॉगिन</h2>
         <div class="form-group">
             <label for="emailInput">ऑफिसर ईमेल आईडी:</label>
             <input type="email" id="emailInput" placeholder="example@gmail.com">
@@ -43,131 +230,441 @@
             <label for="passwordInput">पासवर्ड:</label>
             <input type="password" id="passwordInput" placeholder="पासवर्ड दर्ज करें">
         </div>
-        <button type="button" onclick="loginWithEmail()">ईमेल से लॉगिन करें</button>
+        <button type="button" class="btn btn-primary" onclick="loginWithEmail()">लॉगिन करें</button>
         <div id="loginError"></div>
+        <div style="text-align: center; margin-top: 18px;">
+            <a href="index.html" style="color: var(--primary-light); text-decoration: none; font-size: 14px;">← मुख्य पोर्टल पर वापस जाएं</a>
+        </div>
     </div>
 
     <!-- डैशबोर्ड मुख्य सामग्री -->
     <div id="dashboardContent">
-        <div class="stats-box">
-            <div class="stat-card">
-                <h3 id="totalStudentsCount">0</h3>
-                <p>कुल पंजीकृत छात्र</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="totalAssessmentsCount">0</h3>
-                <p>संपन्न टेस्ट</p>
-            </div>
-        </div>
-
-        <h3 style="color: #333; border-bottom: 2px solid #ddd; padding-bottom: 5px;">छात्र मूल्यांकन रिपोर्ट</h3>
         
-        <div style="overflow-x: auto;">
-            <table id="reportTable">
-                <thead>
-                    <tr>
-                        <th>ब्लॉक</th>
-                        <th>संकुल (AEO)</th>
-                        <th>स्कूल नाम</th>
-                        <th>छात्र का नाम</th>
-                        <th>कक्षा</th>
-                        <th>प्राप्तांक</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- डेटा यहाँ जुड़ेगा -->
-                </tbody>
-            </table>
+        <!-- टॉप स्टैट्स -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3 id="totalStudentsCount">...</h3>
+                    <p>कुल पंजीकृत छात्र (पूरा जिला)</p>
+                </div>
+                <div class="stat-icon">👨‍🎓</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-info">
+                    <h3 id="totalAssessmentsCount">...</h3>
+                    <p>कुल संपन्न टेस्ट (पूरा जिला)</p>
+                </div>
+                <div class="stat-icon">✅</div>
+            </div>
+            <div class="stat-card orange">
+                <div class="stat-info">
+                    <h3 id="filteredCount">0</h3>
+                    <p>फिल्टर किए गए परिणाम</p>
+                </div>
+                <div class="stat-icon">🔍</div>
+            </div>
         </div>
 
-        <button onclick="logout()" style="background: #6c757d; margin-top: 20px;">लॉग आउट करें</button>
-    </div>
+        <!-- फिल्टर और डाउनलोड पैनल -->
+        <div class="filter-panel">
+            <h3>🎯 ब्लॉक, संकुल (AEO) और स्कूल अनुसार डेटा खोजें</h3>
+            <div class="filter-grid">
+                <div>
+                    <label style="font-size: 13px; font-weight: 600; display:block; margin-bottom:5px;">1. ब्लॉक (Block) चुनें:</label>
+                    <select id="blockFilter" class="filter-select" onchange="onBlockChange()">
+                        <option value="ALL">सभी ब्लॉक (All Blocks)</option>
+                        <option value="Mandsaur">Mandsaur (मंदसौर)</option>
+                        <option value="Malhargarh">Malhargarh (मल्हारगढ़)</option>
+                        <option value="Sitamau">Sitamau (सीतामऊ)</option>
+                        <option value="Garoth">Garoth (गरोठ)</option>
+                        <option value="Bhanpura">Bhanpura (भानपुरा)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 13px; font-weight: 600; display:block; margin-bottom:5px;">2. संकुल (AEO Cluster) चुनें:</label>
+                    <select id="aeoFilter" class="filter-select" onchange="onAeoChange()">
+                        <option value="ALL">सभी संकुल (All Clusters)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 13px; font-weight: 600; display:block; margin-bottom:5px;">3. स्कूल (School) चुनें:</label>
+                    <select id="schoolFilter" class="filter-select">
+                        <option value="ALL">सभी स्कूल (All Schools)</option>
+                    </select>
+                </div>
+                <div>
+                    <button class="btn btn-search" style="width: 100%;" onclick="fetchFilteredReports()">🔍 डेटा देखें</button>
+                </div>
+            </div>
 
-    <a href="index.html" class="back-link">← होमपेज पर वापस जाएं</a>
+            <div class="action-bar">
+                <div style="font-size: 13px; color: var(--text-muted);">
+                    * एक्सेल डाउनलोड करने के लिए ऊपर से ब्लॉक/संकुल/स्कूल चुनें:
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-excel-reg" onclick="downloadExcel('students')">📥 पंजीकृत छात्र (Excel डाउनलोड)</button>
+                    <button class="btn btn-excel-test" onclick="downloadExcel('assessments')">📥 टेस्ट देने वाले छात्र (Excel डाउनलोड)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- लोडिंग इंडिकेटर -->
+        <div id="loader">
+            <div class="spinner"></div>
+            <p id="loaderText" style="margin: 0; font-weight: 600; color: var(--primary);">डेटा लोड हो रहा है, कृपया प्रतीक्षा करें...</p>
+        </div>
+
+        <!-- डेटा टेबल -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>📋 छात्र मूल्यांकन (संपन्न टेस्ट) रिपोर्ट</h3>
+                <span id="tableStatusBadge" class="badge">फ़िल्टर चुनें</span>
+            </div>
+            <div class="table-responsive">
+                <table id="reportTable">
+                    <thead>
+                        <tr>
+                            <th>क्र.</th>
+                            <th>ब्लॉक</th>
+                            <th>संकुल (AEO)</th>
+                            <th>स्कूल का नाम (DISE)</th>
+                            <th>छात्र का नाम</th>
+                            <th>पिता का नाम</th>
+                            <th>कक्षा</th>
+                            <th>प्राप्तांक</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                ऊपर दिए गए फिल्टर से <b>ब्लॉक / संकुल / स्कूल</b> चुनें और <b>"डेटा देखें"</b> पर क्लिक करें।<br>
+                                <small>(फायरबेस कोटा बचाने के लिए एक साथ पूरा जिला लोड नहीं किया गया है)</small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
 </div>
 
-<!-- Firebase SDKs (Auth सहित) -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBFgXs1IxALTNoZXgxEW6MkSrq-Q7dguhw",
-    authDomain: "mandsaur-nashamukt.firebaseapp.com",
-    projectId: "mandsaur-nashamukt",
-    storageBucket: "mandsaur-nashamukt.firebasestorage.app",
-    messagingSenderId: "786976421007",
-    appId: "1:786976421007:web:867af9a4f5c72d2a772cfa",
-    measurementId: "G-LQM8SBLMF8"
-  };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBFgXs1IxALTNoZXgxEW6MkSrq-Q7dguhw",
+        authDomain: "mandsaur-nashamukt.firebaseapp.com",
+        projectId: "mandsaur-nashamukt",
+        storageBucket: "mandsaur-nashamukt.firebasestorage.app",
+        messagingSenderId: "786976421007",
+        appId: "1:786976421007:web:867af9a4f5c72d2a772cfa",
+        measurementId: "G-LQM8SBLMF8"
+    };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const auth = firebase.auth();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-  // ईमेल और पासवर्ड से लॉगिन करने का फंक्शन
-  function loginWithEmail() {
-      const email = document.getElementById('emailInput').value.trim();
-      const password = document.getElementById('passwordInput').value.trim();
-      const errorDiv = document.getElementById('loginError');
+    let currentAssessmentData = [];
+    let schoolHierarchy = {}; // Block -> AEO -> Schools मैपिंग स्टोर करने के लिए
 
-      if(!email || !password) {
-          errorDiv.innerText = "कृपया ईमेल और पासवर्ड दोनों दर्ज करें!";
-          return;
-      }
+    function showLoader(msg) {
+        document.getElementById('loaderText').innerText = msg || "डेटा लोड हो रहा है, कृपया प्रतीक्षा करें...";
+        document.getElementById('loader').style.display = 'block';
+    }
 
-      auth.signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-          // लॉगिन सफल होने पर डैशबोर्ड दिखाएं
-          document.getElementById('loginSection').style.display = 'none';
-          document.getElementById('dashboardContent').style.display = 'block';
-          loadDashboardData();
-      })
-      .catch((error) => {
-          errorDiv.innerText = "लॉगिन असफल: " + error.message;
-      });
-  }
+    function hideLoader() {
+        document.getElementById('loader').style.display = 'none';
+    }
 
-  // लॉग आउट फंक्शन
-  function logout() {
-      auth.signOut().then(() => {
-          location.reload();
-      });
-  }
+    // लॉगिन फंक्शन
+    function loginWithEmail() {
+        const email = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passwordInput').value.trim();
+        const errorDiv = document.getElementById('loginError');
 
-  function loadDashboardData() {
-      db.collection("students").get().then((snap) => {
-          document.getElementById('totalStudentsCount').innerText = snap.size;
-      });
+        if(!email || !password) {
+            errorDiv.innerText = "कृपया ईमेल और पासवर्ड दोनों दर्ज करें!";
+            return;
+        }
 
-      db.collection("assessments").orderBy("submittedAt", "desc").get().then((querySnapshot) => {
-          document.getElementById('totalAssessmentsCount').innerText = querySnapshot.size;
-          const tbody = document.getElementById('tableBody');
-          tbody.innerHTML = '';
+        errorDiv.innerText = "लॉगिन हो रहा है...";
+        auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+            document.getElementById('headerActions').style.display = 'block';
+            initializeDashboard();
+        })
+        .catch((error) => {
+            errorDiv.innerText = "लॉगिन असफल: " + error.message;
+        });
+    }
 
-          if(querySnapshot.empty) {
-              tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">अभी तक कोई टेस्ट डेटा उपलब्ध नहीं है।</td></tr>';
-              return;
-          }
+    function logout() {
+        auth.signOut().then(() => location.reload());
+    }
 
-          querySnapshot.forEach((doc) => {
-              const data = doc.data();
-              const sDetails = data.studentDetails || {};
-              
-              let tr = document.createElement('tr');
-              tr.innerHTML = `
-                  <td>${sDetails.blockName || '-'}</td>
-                  <td>${sDetails.aeoCluster || '-'}</td>
-                  <td>${sDetails.schoolName || '-'} (डाइज: ${sDetails.diseCode || '-'})</td>
-                  <td>${sDetails.studentName || 'अज्ञात'}</td>
-                  <td>${sDetails.studentClass || '-'}</td>
-                  <td><b>${data.score} / ${data.totalQuestions}</b></td>
-              `;
-              tbody.appendChild(tr);
-          });
-      });
-  }
+    // डैशबोर्ड शुरू होने पर केवल कुल गिनती (Count Query - सिर्फ 2 रीड्स खर्च होंगी)
+    async function initializeDashboard() {
+        try {
+            const studentCountSnap = await db.collection("students").count().get();
+            document.getElementById('totalStudentsCount').innerText = studentCountSnap.data().count.toLocaleString('en-IN');
+
+            const assessmentCountSnap = await db.collection("assessments").count().get();
+            document.getElementById('totalAssessmentsCount').innerText = assessmentCountSnap.data().count.toLocaleString('en-IN');
+        } catch (err) {
+            console.error("Count Error:", err);
+            document.getElementById('totalStudentsCount').innerText = "उपलब्ध नहीं";
+            document.getElementById('totalAssessmentsCount').innerText = "उपलब्ध नहीं";
+        }
+    }
+
+    // जब ब्लॉक बदला जाए तो उस ब्लॉक के संकुल (AEO) और स्कूल लोड करें
+    async function onBlockChange() {
+        const block = document.getElementById('blockFilter').value;
+        const aeoSelect = document.getElementById('aeoFilter');
+        const schoolSelect = document.getElementById('schoolFilter');
+
+        aeoSelect.innerHTML = '<option value="ALL">सभी संकुल (All Clusters)</option>';
+        schoolSelect.innerHTML = '<option value="ALL">सभी स्कूल (All Schools)</option>';
+
+        if (block === "ALL") return;
+
+        // यदि इस ब्लॉक का मेटाडेटा पहले से लोड नहीं है तो केवल इस ब्लॉक से संकुल/स्कूल की लिस्ट निकालें
+        if (!schoolHierarchy[block]) {
+            showLoader(`${block} ब्लॉक के संकुल और स्कूलों की सूची लोड हो रही है...`);
+            try {
+                // केवल उस ब्लॉक के डॉक्यूमेंट्स से यूनिक संकुल और स्कूल निकालें (लिमिट के साथ ताकि ज्यादा रीड न लगे)
+                const snap = await db.collection("students").where("blockName", "==", block).limit(3000).get();
+                let aeoMap = {};
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const aeo = d.aeoCluster || "अन्य संकुल";
+                    const sch = d.schoolName || "अन्य स्कूल";
+                    if (!aeoMap[aeo]) aeoMap[aeo] = new Set();
+                    aeoMap[aeo].add(sch);
+                });
+                schoolHierarchy[block] = aeoMap;
+            } catch (e) {
+                console.error(e);
+            }
+            hideLoader();
+        }
+
+        const clusters = Object.keys(schoolHierarchy[block] || {}).sort();
+        clusters.forEach(aeo => {
+            let opt = document.createElement('option');
+            opt.value = aeo;
+            opt.innerText = aeo;
+            aeoSelect.appendChild(opt);
+        });
+    }
+
+    // जब संकुल (AEO) बदला जाए तो स्कूल अपडेट करें
+    function onAeoChange() {
+        const block = document.getElementById('blockFilter').value;
+        const aeo = document.getElementById('aeoFilter').value;
+        const schoolSelect = document.getElementById('schoolFilter');
+
+        schoolSelect.innerHTML = '<option value="ALL">सभी स्कूल (All Schools)</option>';
+
+        if (block === "ALL" || !schoolHierarchy[block]) return;
+
+        let schoolsSet = new Set();
+        if (aeo === "ALL") {
+            Object.values(schoolHierarchy[block]).forEach(sSet => sSet.forEach(s => schoolsSet.add(s)));
+        } else if (schoolHierarchy[block][aeo]) {
+            schoolsSet = schoolHierarchy[block][aeo];
+        }
+
+        Array.from(schoolsSet).sort().forEach(sch => {
+            let opt = document.createElement('option');
+            opt.value = sch;
+            opt.innerText = sch;
+            schoolSelect.appendChild(opt);
+        });
+    }
+
+    // फिल्टर के अनुसार टेस्ट रिपोर्ट लोड करें
+    async function fetchFilteredReports() {
+        const block = document.getElementById('blockFilter').value;
+        const aeo = document.getElementById('aeoFilter').value;
+        const school = document.getElementById('schoolFilter').value;
+
+        showLoader("चयनित फ़िल्टर के अनुसार रिपोर्ट लोड हो रही है...");
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        try {
+            let query = db.collection("assessments");
+
+            if (block !== "ALL") {
+                query = query.where("studentDetails.blockName", "==", block);
+            }
+            if (aeo !== "ALL") {
+                query = query.where("studentDetails.aeoCluster", "==", aeo);
+            }
+            if (school !== "ALL") {
+                query = query.where("studentDetails.schoolName", "==", school);
+            }
+
+            // अधिकतम 500 रिकॉर्ड्स एक बार में दिखाएं ताकि ब्राउज़र और रीड लिमिट सुरक्षित रहे
+            const querySnapshot = await query.limit(500).get();
+            currentAssessmentData = [];
+
+            document.getElementById('filteredCount').innerText = querySnapshot.size;
+            document.getElementById('tableStatusBadge').innerText = `${querySnapshot.size} रिकॉर्ड मिले`;
+
+            if (querySnapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">इस फ़िल्टर के अंतर्गत अभी तक किसी छात्र ने टेस्ट नहीं दिया है।</td></tr>';
+                hideLoader();
+                return;
+            }
+
+            let index = 1;
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const s = data.studentDetails || {};
+                currentAssessmentData.push({
+                    srNo: index,
+                    blockName: s.blockName || '-',
+                    aeoCluster: s.aeoCluster || '-',
+                    schoolName: s.schoolName || '-',
+                    diseCode: s.diseCode || '-',
+                    studentName: s.studentName || 'अज्ञात',
+                    fatherName: s.fatherName || '-',
+                    studentClass: s.studentClass || '-',
+                    score: `${data.score || 0} / ${data.totalQuestions || 0}`
+                });
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index++}</td>
+                    <td>${s.blockName || '-'}</td>
+                    <td>${s.aeoCluster || '-'}</td>
+                    <td>${s.schoolName || '-'} <br><small style="color:#64748b;">DISE: ${s.diseCode || '-'}</small></td>
+                    <td><b>${s.studentName || 'अज्ञात'}</b></td>
+                    <td>${s.fatherName || '-'}</td>
+                    <td>${s.studentClass || '-'}</td>
+                    <td><span class="badge" style="background:#dcfce7; color:#166534;">${data.score} / ${data.totalQuestions}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            alert("डेटा लोड करने में त्रुटि आई: " + error.message + "\n(नोट: यदि आप एक से अधिक फ़िल्टर लगा रहे हैं, तो Firebase Console में Composite Index बनाना पड़ सकता है।)");
+        }
+        hideLoader();
+    }
+
+    // एक्सेल (CSV) फाइल जनरेट और डाउनलोड करने का फंक्शन
+    async function downloadExcel(type) {
+        const block = document.getElementById('blockFilter').value;
+        const aeo = document.getElementById('aeoFilter').value;
+        const school = document.getElementById('schoolFilter').value;
+
+        if (block === "ALL" && type === "students") {
+            const confirmAll = confirm("चेतावनी: 'सभी ब्लॉक' चुनने पर एक साथ बहुत सारा डेटा डाउनलोड होगा जिससे फायरबेस की दैनिक रीड लिमिट (50,000) खत्म हो सकती है। क्या आप केवल किसी एक ब्लॉक को चुनना चाहेंगे?\n\n(फिर भी जारी रखने के लिए OK दबाएं, अन्यथा Cancel करें)");
+            if (!confirmAll) return;
+        }
+
+        showLoader(type === 'students' ? "पंजीकृत छात्रों की एक्सेल शीट तैयार हो रही है..." : "संपन्न टेस्ट की एक्सेल शीट तैयार हो रही है...");
+
+        try {
+            let csvRows = [];
+            // हिंदी अक्षर Excel में सही दिखें इसके लिए UTF-8 BOM जोड़ें
+            const BOM = "\uFEFF";
+
+            if (type === 'students') {
+                let query = db.collection("students");
+                if (block !== "ALL") query = query.where("blockName", "==", block);
+                if (aeo !== "ALL") query = query.where("aeoCluster", "==", aeo);
+                if (school !== "ALL") query = query.where("schoolName", "==", school);
+
+                const snap = await query.limit(10000).get();
+                if (snap.empty) {
+                    alert("इस फ़िल्टर में कोई पंजीकृत छात्र नहीं मिला!");
+                    hideLoader();
+                    return;
+                }
+
+                csvRows.push(["Sr.No.", "Block Name", "AEO Cluster", "School Name", "DISE Code", "Student Name", "Father Name", "Class", "Gender"].join(","));
+                let count = 1;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    csvRows.push([
+                        count++,
+                        `"${(d.blockName || '').replace(/"/g, '""')}"`,
+                        `"${(d.aeoCluster || '').replace(/"/g, '""')}"`,
+                        `"${(d.schoolName || '').replace(/"/g, '""')}"`,
+                        `"${(d.diseCode || '').replace(/"/g, '""')}"`,
+                        `"${(d.studentName || '').replace(/"/g, '""')}"`,
+                        `"${(d.fatherName || '').replace(/"/g, '""')}"`,
+                        `"${(d.studentClass || '').replace(/"/g, '""')}"`,
+                        `"${(d.Gender || '').replace(/"/g, '""')}"`
+                    ].join(","));
+                });
+
+                triggerCSVDownload(BOM + csvRows.join("\n"), `Registered_Students_${block}.csv`);
+
+            } else if (type === 'assessments') {
+                let query = db.collection("assessments");
+                if (block !== "ALL") query = query.where("studentDetails.blockName", "==", block);
+                if (aeo !== "ALL") query = query.where("studentDetails.aeoCluster", "==", aeo);
+                if (school !== "ALL") query = query.where("studentDetails.schoolName", "==", school);
+
+                const snap = await query.limit(10000).get();
+                if (snap.empty) {
+                    alert("इस फ़िल्टर में कोई संपन्न टेस्ट रिकॉर्ड नहीं मिला!");
+                    hideLoader();
+                    return;
+                }
+
+                csvRows.push(["Sr.No.", "Block Name", "AEO Cluster", "School Name", "DISE Code", "Student Name", "Father Name", "Class", "Score", "Total Questions"].join(","));
+                let count = 1;
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const s = data.studentDetails || {};
+                    csvRows.push([
+                        count++,
+                        `"${(s.blockName || '').replace(/"/g, '""')}"`,
+                        `"${(s.aeoCluster || '').replace(/"/g, '""')}"`,
+                        `"${(s.schoolName || '').replace(/"/g, '""')}"`,
+                        `"${(s.diseCode || '').replace(/"/g, '""')}"`,
+                        `"${(s.studentName || '').replace(/"/g, '""')}"`,
+                        `"${(s.fatherName || '').replace(/"/g, '""')}"`,
+                        `"${(s.studentClass || '').replace(/"/g, '""')}"`,
+                        data.score || 0,
+                        data.totalQuestions || 0
+                    ].join(","));
+                });
+
+                triggerCSVDownload(BOM + csvRows.join("\n"), `Completed_Tests_${block}.csv`);
+            }
+
+        } catch (err) {
+            console.error("Download Error:", err);
+            alert("एक्सेल डाउनलोड करने में त्रुटि आई: " + err.message);
+        }
+        hideLoader();
+    }
+
+    function triggerCSVDownload(csvContent, fileName) {
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 </script>
 
 </body>
