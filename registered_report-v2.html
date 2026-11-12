@@ -422,7 +422,7 @@
             if (school !== "ALL") query = query.where("schoolName", "==", school);
             if (cls !== "ALL") query = query.where("studentClass", "==", cls);
 
-            const snap = await query.limit(50000).get();
+            const snap = await query.limit(1000).get();
             allFetchedRecords = [];
             snap.forEach(doc => {
                 allFetchedRecords.push(doc.data());
