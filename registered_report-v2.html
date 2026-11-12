@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पंजीकृत छात्र रिपोर्ट - मंदसौर नशा मुक्ति पोर्टल</title>
+    <style>
+    :root {
+        --primary: #ea580c;
+        --primary-dark: #c2410c;
+        --primary-light: #ffedd5;
+        --accent-green: #10b981;
+        --accent-green-hover: #059669;
+        --bg-body: #f8fafc;
+        --card-bg: #ffffff;
+        --border-color: #cbd5e1;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        margin: 0;
+        padding: 0;
+        line-height: 1.5;
+    }
+
+    .navbar {
+        background: linear-gradient(135deg, #9a3412, var(--primary));
+        color: white;
+        padding: 14px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .nav-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .nav-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .nav-btn {
+        text-decoration: none;
+        color: white;
+        background: rgba(255,255,255,0.15);
+        padding: 7px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid rgba(255,255,255,0.25);
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+        background: white;
+        color: var(--primary-dark);
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .fieldset-card {
+        position: relative;
+        background: var(--card-bg);
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 24px 20px 20px 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .fieldset-legend {
+        position: absolute;
+        top: -13px;
+        left: 18px;
+        background: white;
+        border: 1.5px solid #cbd5e1;
+        color: var(--primary-dark);
+        padding: 2px 14px;
+        border-radius: 6px;
+        font-size: 13.5px;
+        font-weight: 700;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 6px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 14px;
+        background: #fff;
+        color: var(--text-main);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+    }
+
+    .btn-row {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-search {
+        background-color: var(--accent-green);
+        color: white;
+        min-width: 130px;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-search:hover {
+        background-color: var(--accent-green-hover);
+    }
+
+    .btn-clear {
+        background-color: #fff;
+        color: var(--primary-dark);
+        border: 1px solid #cbd5e1;
+        min-width: 110px;
+    }
+
+    .btn-clear:hover {
+        background-color: #f1f5f9;
+    }
+
+    .btn-excel {
+        background-color: #fff;
+        color: #1e293b;
+        border: 1.5px solid #94a3b8;
+        padding: 7px 14px;
+        font-size: 13px;
+    }
+
+    .btn-excel:hover {
+        background-color: #f1f5f9;
+        border-color: var(--primary);
+        color: var(--primary-dark);
+    }
+
+    #loaderBox {
+        display: none;
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
+        margin-bottom: 20px;
+    }
+
+    .spinner {
+        width: 44px;
+        height: 44px;
+        border: 4px solid var(--primary-light);
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+        margin: 0 auto 12px auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .table-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .toolbar-left, .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .records-select {
+        padding: 6px 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 13.5px;
+        font-weight: 600;
+    }
+
+    .quick-search {
+        padding: 7px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 13.5px;
+        width: 200px;
+    }
+
+    .quick-search:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 750px;
+    }
+
+    thead th {
+        background: linear-gradient(180deg, #fb923c, #f97316);
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 13.5px;
+        padding: 12px 14px;
+        text-align: left;
+        border-right: 1px solid rgba(255,255,255,0.3);
+        white-space: nowrap;
+    }
+
+    tbody td {
+        padding: 11px 14px;
+        font-size: 13.5px;
+        border-bottom: 1px solid #e2e8f0;
+        border-right: 1px solid #f1f5f9;
+        color: #334155;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    tbody tr:hover {
+        background-color: #fff7ed;
+    }
+
+    .pagination-bar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 14px;
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    .page-btns {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .page-btn {
+        padding: 5px 12px;
+        border: 1px solid #cbd5e1;
+        background: white;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .page-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .page-btn:not(:disabled):hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+    }
+
+    @media (max-width: 600px) {
+        .navbar { padding: 12px 15px; }
+        .nav-title { font-size: 16px; }
+        .fieldset-card { padding: 20px 14px 16px 14px; }
+        .quick-search { width: 100%; }
+        .toolbar-right { width: 100%; justify-content: space-between; }
+        .btn-search, .btn-clear { flex: 1; }
+    }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-brand">
+        <span class="nav-badge">पंजीकृत रिपोर्ट</span>
+        <h1 class="nav-title">मंदसौर नशा मुक्ति पोर्टल</h1>
+    </div>
+    <div class="nav-links">
+        <a href="admin_login.html" class="nav-btn">🏠 रिपोर्ट मेनू</a>
+        <a href="registered_report-v2.html" class="nav-btn active">👨‍🎓 पंजीकृत छात्र</a>
+        <a href="assessment_report-v2.html" class="nav-btn">✅ संपन्न टेस्ट रिपोर्ट</a>
+        <button class="nav-btn" onclick="logout()">लॉग आउट</button>
+    </div>
+</nav>
+
+<div class="container" id="mainContent" style="display: none;">
+    
+    <!-- फ़िल्टर कार्ड -->
+    <div class="fieldset-card">
+        <span class="fieldset-legend">Student Details Report (फ़िल्टर)</span>
+        <div class="filter-grid">
+            <div class="form-group">
+                <label>ब्लॉक (Block) चुनें:</label>
+                <select id="blockFilter" class="form-control" onchange="onBlockChange()">
+                    <option value="ALL">सभी ब्लॉक (All Blocks)</option>
+                    <option value="Mandsaur">Mandsaur (मंदसौर)</option>
+                    <option value="Malhargarh">Malhargarh (मल्हारगढ़)</option>
+                    <option value="Sitamau">Sitamau (सीतामऊ)</option>
+                    <option value="Garoth">Garoth (गरोठ)</option>
+                    <option value="Bhanpura">Bhanpura (भानपुरा)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>संकुल (AEO Cluster) चुनें:</label>
+                <select id="aeoFilter" class="form-control" onchange="onAeoChange()">
+                    <option value="ALL">सभी संकुल (All Clusters)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>स्कूल (School) चुनें:</label>
+                <select id="schoolFilter" class="form-control">
+                    <option value="ALL">सभी स्कूल (All Schools)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>कक्षा (Class) चुनें:</label>
+                <select id="classFilter" class="form-control">
+                    <option value="ALL">सभी कक्षाएं (All Classes)</option>
+                    <option value="Class - 6">Class - 6</option>
+                    <option value="Class - 7">Class - 7</option>
+                    <option value="Class - 8">Class - 8</option>
+                    <option value="Class - 9">Class - 9</option>
+                    <option value="Class - 10">Class - 10</option>
+                    <option value="Class - 11">Class - 11</option>
+                    <option value="Class - 12">Class - 12</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn btn-search" onclick="searchData()">🔍 Search</button>
+            <button class="btn btn-clear" onclick="clearFilters()">Clear</button>
+        </div>
+    </div>
+
+    <!-- लोडिंग चकरा -->
+    <div id="loaderBox">
+        <div class="spinner"></div>
+        <p id="loaderMsg" style="margin: 0; font-weight: 600; color: #c2410c;">डेटा लोड हो रहा है, कृपया प्रतीक्षा करें...</p>
+    </div>
+
+    <!-- टेबल सेक्शन -->
+    <div id="resultCard" class="fieldset-card" style="display: none;">
+        <span class="fieldset-legend">Registered Student List</span>
+        
+        <div class="table-toolbar">
+            <div class="toolbar-left">
+                <label style="font-size: 13.5px; font-weight: 600;">Records per page:</label>
+                <select id="recordsPerPage" class="records-select" onchange="changePageSize()">
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                    <option value="250">250</option>
+                    <option value="500">500</option>
+                </select>
+            </div>
+
+            <div class="toolbar-right">
+                <button class="btn btn-excel" onclick="exportToExcel()">📥 Export To Excel</button>
+                <input type="text" id="quickSearchInput" class="quick-search" placeholder="🔍 नाम या DISE खोजें..." onkeyup="applyQuickSearch()">
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sr.No.</th>
+                        <th>DISE Code</th>
+                        <th>Student Name</th>
+                        <th>Father Name</th>
+                        <th>Gender</th>
+                        <th>Class</th>
+                        <th>School Name</th>
+                        <th>Block</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar">
+            <div id="pageInfoText">Page 1 of 1 (0 items)</div>
+            <div class="page-btns">
+                <button class="page-btn" id="prevPageBtn" onclick="prevPage()">‹ पिछला</button>
+                <span id="currentPageBadge" style="font-weight: 700; padding: 0 8px;">1</span>
+                <button class="page-btn" id="nextPageBtn" onclick="nextPage()">अगला ›</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBFgXs1IxALTNoZXgxEW6MkSrq-Q7dguhw",
+        authDomain: "mandsaur-nashamukt.firebaseapp.com",
+        projectId: "mandsaur-nashamukt",
+        storageBucket: "mandsaur-nashamukt.firebasestorage.app",
+        messagingSenderId: "786976421007",
+        appId: "1:786976421007:web:867af9a4f5c72d2a772cfa",
+        measurementId: "G-LQM8SBLMF8"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    let allFetchedRecords = [];
+    let filteredRecords = [];
+    let currentPage = 1;
+    let pageSize = 50;
+    let hierarchyCache = {};
+
+    // यदि लॉगिन नहीं है तो सीधे admin_login.html पर भेज दें
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById('mainContent').style.display = 'block';
+        } else {
+            window.location.href = "admin_login.html";
+        }
+    });
+
+    function logout() {
+        auth.signOut().then(() => {
+            window.location.href = "admin_login.html";
+        });
+    }
+
+    function showLoader(msg) {
+        document.getElementById('loaderMsg').innerText = msg || "डेटा लोड हो रहा है, कृपया प्रतीक्षा करें...";
+        document.getElementById('loaderBox').style.display = 'block';
+    }
+
+    function hideLoader() {
+        document.getElementById('loaderBox').style.display = 'none';
+    }
+
+    async function onBlockChange() {
+        const block = document.getElementById('blockFilter').value;
+        const aeoSelect = document.getElementById('aeoFilter');
+        const schoolSelect = document.getElementById('schoolFilter');
+
+        aeoSelect.innerHTML = '<option value="ALL">सभी संकुल (All Clusters)</option>';
+        schoolSelect.innerHTML = '<option value="ALL">सभी स्कूल (All Schools)</option>';
+
+        if (block === "ALL") return;
+
+        if (!hierarchyCache[block]) {
+            showLoader(`${block} ब्लॉक के संकुल और स्कूल लोड हो रहे हैं...`);
+            try {
+                const snap = await db.collection("students").where("blockName", "==", block).limit(3000).get();
+                let map = {};
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const aeo = d.aeoCluster || "अन्य संकुल";
+                    const sch = d.schoolName || "अन्य स्कूल";
+                    if (!map[aeo]) map[aeo] = new Set();
+                    map[aeo].add(sch);
+                });
+                hierarchyCache[block] = map;
+            } catch (e) {
+                console.error(e);
+            }
+            hideLoader();
+        }
+
+        Object.keys(hierarchyCache[block] || {}).sort().forEach(aeo => {
+            let opt = document.createElement('option');
+            opt.value = aeo;
+            opt.innerText = aeo;
+            aeoSelect.appendChild(opt);
+        });
+    }
+
+    function onAeoChange() {
+        const block = document.getElementById('blockFilter').value;
+        const aeo = document.getElementById('aeoFilter').value;
+        const schoolSelect = document.getElementById('schoolFilter');
+
+        schoolSelect.innerHTML = '<option value="ALL">सभी स्कूल (All Schools)</option>';
+        if (block === "ALL" || !hierarchyCache[block]) return;
+
+        let schools = new Set();
+        if (aeo === "ALL") {
+            Object.values(hierarchyCache[block]).forEach(s => s.forEach(item => schools.add(item)));
+        } else if (hierarchyCache[block][aeo]) {
+            schools = hierarchyCache[block][aeo];
+        }
+
+        Array.from(schools).sort().forEach(sch => {
+            let opt = document.createElement('option');
+            opt.value = sch;
+            opt.innerText = sch;
+            schoolSelect.appendChild(opt);
+        });
+    }
+
+    async function searchData() {
+        const block = document.getElementById('blockFilter').value;
+        const aeo = document.getElementById('aeoFilter').value;
+        const school = document.getElementById('schoolFilter').value;
+        const cls = document.getElementById('classFilter').value;
+
+        if (block === "ALL") {
+            const ok = confirm("आपने 'सभी ब्लॉक' चुना है। एक साथ ज्यादा रिकॉर्ड लोड करने पर फायरबेस रीड लिमिट जल्दी खर्च हो सकती है। क्या आप जारी रखना चाहते हैं?");
+            if (!ok) return;
+        }
+
+        document.getElementById('resultCard').style.display = 'none';
+        showLoader("पंजीकृत छात्रों का डेटा लोड हो रहा है...");
+
+        try {
+            let query = db.collection("students");
+            if (block !== "ALL") query = query.where("blockName", "==", block);
+            if (aeo !== "ALL") query = query.where("aeoCluster", "==", aeo);
+            if (school !== "ALL") query = query.where("schoolName", "==", school);
+            if (cls !== "ALL") query = query.where("studentClass", "==", cls);
+
+            const snap = await query.limit(5000).get();
+            allFetchedRecords = [];
+            snap.forEach(doc => {
+                allFetchedRecords.push(doc.data());
+            });
+
+            document.getElementById('quickSearchInput').value = '';
+            filteredRecords = [...allFetchedRecords];
+            currentPage = 1;
+            renderTable();
+
+            hideLoader();
+            document.getElementById('resultCard').style.display = 'block';
+        } catch (err) {
+            hideLoader();
+            alert("डेटा लोड करने में त्रुटि: " + err.message + "
+(यदि एक से अधिक फ़िल्टर लगे हैं, तो Firebase Console में Index लिंक पर क्लिक करके Index बनाएं)");
+        }
+    }
+
+    function clearFilters() {
+        document.getElementById('blockFilter').value = "ALL";
+        document.getElementById('aeoFilter').innerHTML = '<option value="ALL">सभी संकुल (All Clusters)</option>';
+        document.getElementById('schoolFilter').innerHTML = '<option value="ALL">सभी स्कूल (All Schools)</option>';
+        document.getElementById('classFilter').value = "ALL";
+        document.getElementById('resultCard').style.display = 'none';
+        allFetchedRecords = [];
+        filteredRecords = [];
+    }
+
+    function applyQuickSearch() {
+        const term = document.getElementById('quickSearchInput').value.toLowerCase().trim();
+        if (!term) {
+            filteredRecords = [...allFetchedRecords];
+        } else {
+            filteredRecords = allFetchedRecords.filter(r =>
+                (r.studentName || '').toLowerCase().includes(term) ||
+                (r.fatherName || '').toLowerCase().includes(term) ||
+                (r.diseCode || '').toString().toLowerCase().includes(term) ||
+                (r.schoolName || '').toLowerCase().includes(term)
+            );
+        }
+        currentPage = 1;
+        renderTable();
+    }
+
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('recordsPerPage').value, 10);
+        currentPage = 1;
+        renderTable();
+    }
+
+    function prevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+        }
+    }
+
+    function nextPage() {
+        const totalPages = Math.ceil(filteredRecords.length / pageSize) || 1;
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+        }
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        const totalItems = filteredRecords.length;
+        const totalPages = Math.ceil(totalItems / pageSize) || 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        const startIdx = (currentPage - 1) * pageSize;
+        const endIdx = Math.min(startIdx + pageSize, totalItems);
+        const pageData = filteredRecords.slice(startIdx, endIdx);
+
+        document.getElementById('pageInfoText').innerText = `Page ${currentPage} of ${totalPages} (${totalItems} items)`;
+        document.getElementById('currentPageBadge').innerText = `${currentPage} of ${totalPages}`;
+        document.getElementById('prevPageBtn').disabled = (currentPage <= 1);
+        document.getElementById('nextPageBtn').disabled = (currentPage >= totalPages);
+
+        if (pageData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 25px; color: #64748b;">कोई रिकॉर्ड नहीं मिला।</td></tr>';
+            return;
+        }
+
+        pageData.forEach((d, i) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${startIdx + i + 1}</td>
+                <td>${d.diseCode || '-'}</td>
+                <td><b>${d.studentName || '-'}</b></td>
+                <td>${d.fatherName || '-'}</td>
+                <td>${d.Gender || '-'}</td>
+                <td>${d.studentClass || '-'}</td>
+                <td>${d.schoolName || '-'}</td>
+                <td>${d.blockName || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function exportToExcel() {
+        if (filteredRecords.length === 0) {
+            alert("डाउनलोड करने के लिए कोई डेटा उपलब्ध नहीं है!");
+            return;
+        }
+        const BOM = "﻿";
+        let rows = [
+            ["Sr.No.", "DISE Code", "Student Name", "Father Name", "Gender", "Class", "School Name", "AEO Cluster", "Block Name"].join(",")
+        ];
+
+        filteredRecords.forEach((d, idx) => {
+            rows.push([
+                idx + 1,
+                `"${(d.diseCode || '').toString().replace(/"/g, '""')}"`,
+                `"${(d.studentName || '').replace(/"/g, '""')}"`,
+                `"${(d.fatherName || '').replace(/"/g, '""')}"`,
+                `"${(d.Gender || '').replace(/"/g, '""')}"`,
+                `"${(d.studentClass || '').replace(/"/g, '""')}"`,
+                `"${(d.schoolName || '').replace(/"/g, '""')}"`,
+                `"${(d.aeoCluster || '').replace(/"/g, '""')}"`,
+                `"${(d.blockName || '').replace(/"/g, '""')}"`
+            ].join(","));
+        });
+
+        const blob = new Blob([BOM + rows.join("
+")], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Registered_Students_Report.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+
+</body>
+</html>
